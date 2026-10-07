@@ -104,7 +104,7 @@
 @media (min-width: 768px) { :root { --gutter: 24px; --header-h: 64px; } }
 
 html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 72px); -webkit-text-size-adjust: 100%; }
 body {
   background: var(--bg); color: var(--text);
   font-family: var(--font); font-size: 16px; line-height: 1.6;
@@ -131,7 +131,7 @@ strong { color: var(--text); font-weight: 600; }
 .skip:focus { left: var(--s3); top: var(--s3); }
 
 /* =====================================================
-   HEADER — 3 zones: [Logo] [Spacer] [Coins + Profile + Ghost]
+   HEADER — compact on mobile (logo row + scrollable nav row)
 ===================================================== */
 .site-header {
   position: sticky; top: 0; z-index: 100;
@@ -140,32 +140,103 @@ strong { color: var(--text); font-weight: 600; }
   border-bottom: 1px solid var(--line);
 }
 .header-inner {
-  display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: var(--s3);
-  width: 100%; max-width: 1120px; min-height: var(--header-h); margin: 0 auto; padding: 0 var(--gutter);
-  overflow: visible; min-width: 0;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  column-gap: var(--s4); width: 100%; max-width: var(--maxw); margin: 0 auto;
+  padding: 0 var(--gutter); min-width: 0;
 }
 .logo {
-  display: inline-flex; flex-direction: row; align-items: center; flex-shrink: 0; gap: var(--s2);
-  white-space: nowrap; min-height: var(--header-h);
-  font-weight: 700; font-size: 17px; line-height: 1; letter-spacing: -0.02em; color: var(--text); text-decoration: none;
+  display: inline-flex; align-items: center; gap: var(--s2); min-height: var(--header-h);
+  font-weight: 700; font-size: 17px; letter-spacing: -0.02em;
+  color: var(--text); text-decoration: none; min-width: 0;
 }
-.logo [data-brand] { white-space: nowrap; writing-mode: horizontal-tb; }
 .logo-mark { width: 28px; height: 28px; color: var(--accent); flex: none; }
-.header-spacer { flex: 1 1 0; min-width: 0; }
+.header-right { display: none; align-items: center; gap: var(--s2); }
+.header-badge {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 32px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0 var(--s3); color: var(--text-dim); background: var(--surface);
+}
+.header-badge svg { width: 14px; height: 14px; color: var(--accent); flex: none; }
+
+.main-nav {
+  display: flex; flex-direction: row; gap: var(--s1); width: calc(100% + var(--gutter) * 2);
+  margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) var(--s2);
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; order: 3;
+}
+.main-nav::-webkit-scrollbar { display: none; }
+.main-nav a {
+  flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s4);
+  color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;
+  border-radius: var(--r-sm); transition: color .2s, background .2s;
+}
+.main-nav a:hover { color: var(--text); background: var(--surface-2); }
+.main-nav a:active { background: var(--surface); }
+.main-nav a.nav-cta { color: var(--accent); font-weight: 600; background: var(--accent-soft); border: 1px solid var(--accent-line); margin-left: auto; }
+.main-nav a.nav-cta:hover { background: rgba(61, 220, 151, 0.16); color: var(--accent-hover); }
+
+@media (min-width: 900px) {
+  .header-inner { flex-wrap: nowrap; }
+  .header-right { display: flex; order: 3; }
+  .main-nav { order: 2; flex: 1; width: auto; margin: 0 0 0 var(--s6); padding: 0; overflow: visible; }
+  .main-nav a.nav-cta { margin-left: auto; }
+}
 
 /* =====================================================
-   APP TITLE BAR (replaces the marketing hero)
+   HERO
 ===================================================== */
-.app-bar { display: flex; justify-content: center; padding: var(--s5) var(--gutter) 0; min-width: 0; }
-.app-title {
-  display: inline-flex; align-items: center; gap: var(--s2); max-width: 100%; margin: 0;
-  padding: 6px var(--s4); font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: 0.01em; text-align: center;
-  color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: 999px;
+.hero {
+  padding: var(--s7) 0 var(--s5); position: relative;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(61, 220, 151, 0.09), transparent 70%);
 }
-.app-title .dot { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+.hero-grid { display: flex; flex-direction: column; gap: var(--s7); align-items: stretch; min-width: 0; }
+@media (min-width: 900px) {
+  .hero { padding: var(--s9) 0 var(--s7); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: var(--s8); align-items: center; }
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: var(--s2); max-width: 100%;
+  font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; line-height: 1.4;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid var(--accent-line); background: var(--accent-soft); border-radius: 999px;
+  padding: 6px var(--s3); margin-bottom: var(--s5);
+}
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; flex: none; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Rewarded-ad placeholder (used inside modals only) */
+h1 {
+  font-size: clamp(2rem, 7.5vw, 3.5rem); line-height: 1.1; letter-spacing: -0.035em;
+  font-weight: 800; margin-bottom: var(--s4); text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--accent); }
+.hero-pitch { font-size: 16px; line-height: 1.7; max-width: 58ch; margin-bottom: var(--s5); }
+@media (min-width: 768px) { .hero-pitch { font-size: 17px; } }
+.trust-chips { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.chip {
+  display: inline-flex; align-items: center; gap: var(--s2); min-height: 36px;
+  font-size: 13px; font-weight: 500; line-height: 1.2;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 0 var(--s3); color: var(--text-dim);
+}
+.chip svg { width: 14px; height: 14px; color: var(--accent); flex: none; }
+
+.peer-viz {
+  position: relative; width: 100%; max-width: 420px; margin: 0 auto; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s4);
+}
+.peer-viz svg { width: 100%; height: auto; }
+.viz-node { fill: var(--surface-2); stroke: var(--accent); stroke-width: 1.5; }
+.viz-label { font-family: var(--mono); font-size: 11px; fill: var(--text-dim); text-anchor: middle; }
+.packet { fill: var(--accent); }
+.packet-track { stroke: var(--line-strong); stroke-width: 2; stroke-dasharray: 6 8; fill: none; }
+.packet-line { stroke: var(--accent); stroke-width: 2; fill: none; opacity: 0.35; stroke-dasharray: 60 300; animation: dashflow 2.4s linear infinite; }
+@keyframes dashflow { to { stroke-dashoffset: -360; } }
+.file-tag { font-family: var(--mono); font-size: 10px; fill: var(--accent); }
+
+/* =====================================================
+   AD SLOTS
+===================================================== */
+.ad-slot { width: 100%; max-width: var(--maxw); margin: var(--s7) auto; padding: 0 var(--gutter); }
 .ad-box {
   border: 1px dashed var(--line-strong); border-radius: var(--r); background: var(--surface);
   min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -453,7 +524,7 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
 .avatar.lg { width: 56px; height: 56px; font-size: 18px; }
 
 /* Header actions */
-.header-actions { display: flex; align-items: center; gap: var(--s2); min-width: 0; }
+.header-actions { order: 2; margin-left: auto; display: flex; align-items: center; gap: var(--s2); min-width: 0; }
 .coin-pill {
   display: inline-flex; align-items: center; gap: var(--s1); min-height: 44px; padding: 0 var(--s1) 0 var(--s3);
   background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
@@ -479,11 +550,13 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
 @keyframes presence { 70% { box-shadow: 0 0 0 6px rgba(61, 220, 151, 0); } 100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); } }
 .presence-toggle[aria-pressed="true"] .presence-dot { background: var(--text-faint); animation: none; }
 .presence-toggle[aria-pressed="true"] { color: var(--text); }
-@media (max-width: 479px) { .coin-label, .earn-label { display: none; } .coin-pill { padding-left: var(--s2); } }
+@media (max-width: 479px) { .coin-label, .earn-label { display: none; } .logo [data-brand] { display: none; } .coin-pill { padding-left: var(--s2); } }
 @media (min-width: 560px) { .presence-label { display: inline; } }
 @media (min-width: 640px) { .profile-text { display: flex; } }
+@media (min-width: 900px) { .header-actions { order: 4; margin-left: var(--s4); } .header-right { margin-left: auto; } .main-nav { flex: 0 1 auto; } }
 
 /* Workspace shell */
+.tool-card-glow { max-width: 760px; }
 .ws-tabs {
   display: flex; gap: var(--s1); padding: var(--s1); margin-bottom: var(--s5); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
   background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md);
@@ -623,48 +696,6 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
 .handle-field { display: flex; align-items: center; gap: var(--s2); color: var(--text-faint); font-family: var(--mono); }
 .modal-backdrop { overflow-y: auto; }
 #vaultModal .modal .check-ring { margin-bottom: var(--s3); }
-
-/* =====================================================
-   v3 — HEADER HARDENING, WORKSPACE CONTAINERS, SEO DRAWER
-===================================================== */
-.header-actions { flex-shrink: 0; }
-.coin-pill, .profile-capsule, .profile-btn, .presence-toggle, .coin-earn, .avatar { flex-shrink: 0; }
-.profile-text { flex-shrink: 1; }
-@media (max-width: 374px) {
-  :root { --gutter: 12px; }
-  .header-inner { gap: var(--s2); }
-  .logo { font-size: 16px; gap: 6px; }
-  .logo-mark { width: 24px; height: 24px; }
-  .header-actions { gap: 6px; }
-  .coin-pill { padding-left: var(--s2); }
-  .coin-earn { min-width: 40px; margin-left: 2px; padding: 0 var(--s2); }
-  .profile-btn, .presence-toggle { min-width: 40px; padding: 0 var(--s1); }
-}
-
-.tool-section { padding-top: 0; padding-bottom: 0; }
-.tool-card-glow { width: 100%; max-width: 780px; margin: var(--s5) auto; }
-.tool-card-glow, .tool-card { min-width: 0; overflow: hidden; }
-.ws-panel, .panel, .chat-shell, .walkie-shell, .peer-card, .peer-meta, .mod-bar, .share-row, .file-pill,
-.room-display, .progress-zone, .composer, .dropzone, .room-code-card, .chat-head, .speaker-banner, .ptt-stage { min-width: 0; }
-
-.seo-drawer { width: 100%; max-width: 780px; margin: 0 auto var(--s7); padding: 0 var(--gutter); min-width: 0; }
-.seo-accordion { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
-.seo-toggle { min-height: 56px; padding: var(--s3) var(--s5); font-size: 15px; }
-.seo-body { padding: 0 var(--s5) var(--s6); min-width: 0; }
-@media (min-width: 768px) { .seo-body { padding: 0 var(--s6) var(--s7); } }
-.seo-accordion .section { padding: var(--s7) 0 0; }
-.seo-accordion .section-head { margin-bottom: var(--s5); max-width: none; }
-.seo-accordion h2 { font-size: clamp(1.25rem, 4vw, 1.6rem); }
-.seo-accordion details { background: var(--bg); }
-.seo-accordion .faq-list { max-width: none; }
-.seo-accordion .features-grid { grid-template-columns: 1fr; }
-@media (min-width: 640px) { .seo-accordion .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.seo-accordion .feature-card { background: var(--bg); }
-.seo-accordion .steps { display: flex; flex-direction: column; gap: var(--s5); }
-.seo-accordion .step { flex-direction: row; gap: var(--s4); }
-.seo-accordion .step:not(:last-child)::after { left: 23px; right: auto; top: 52px; bottom: -20px; width: 2px; height: auto; }
-.seo-accordion .step-body { padding-top: var(--s2); }
-.seo-accordion .limit-box { background: var(--bg); }
 </style>
 </head>
 <body>
@@ -683,7 +714,16 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
       </svg>
       <span data-brand>DropP2P</span>
     </a>
-    <span class="header-spacer" aria-hidden="true"></span>
+    <div class="header-right">
+      <span class="header-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+        P2P Encrypted
+      </span>
+      <span class="header-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M5 10l7-7 7 7"/></svg>
+        No Size Limit
+      </span>
+    </div>
     <div class="header-actions">
       <div class="coin-pill" id="coinPill">
         <span class="coin-ico" aria-hidden="true">🪙</span>
@@ -701,12 +741,51 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
         </button>
       </div>
     </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="#tool" class="nav-cta">Start Transfer</a>
+    </nav>
   </div>
 </header>
 
 <main>
-  <!-- ============ APP TITLE BAR ============ -->
-  <div class="app-bar"><h1 class="app-title" id="page-title"><span class="dot" aria-hidden="true"></span><span><span data-brand>DropP2P</span> &mdash; Direct P2P Pipe</span></h1></div>
+  <!-- ============ HERO + TOOL ============ -->
+  <section class="hero" aria-labelledby="page-title">
+    <div class="wrap hero-grid">
+      <div style="min-width:0">
+        <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Peer-to-Peer &middot; WebRTC &middot; No Cloud</span>
+        <h1 id="page-title">Direct <em>Peer-to-Peer</em> File Transfer Without Cloud Limits</h1>
+        <p class="hero-pitch">Send files of any size (1 GB to 50 GB+) directly from your phone or PC to anyone across cities. Powered by WebRTC direct data channels with zero cloud storage, zero file size limits, and military-grade peer-to-peer encryption.</p>
+        <div class="trust-chips" aria-label="Trust indicators">
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>End-to-End Encrypted</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7h13M3 12h9M3 17h13"/><path d="M19 9l3 3-3 3"/></svg>Zero Cloud Storage</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M5 10l7-7 7 7"/></svg>Unlimited File Size</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg>No Sign-Up Required</span>
+        </div>
+      </div>
+
+      <!-- Peer-link visualization -->
+      <div class="peer-viz" aria-hidden="true">
+        <svg viewBox="0 0 400 340">
+          <path class="packet-track" d="M80 90 C 180 40, 220 300, 320 250"/>
+          <path class="packet-line" d="M80 90 C 180 40, 220 300, 320 250"/>
+          <circle cx="80" cy="90" r="34" class="viz-node"/>
+          <circle cx="80" cy="90" r="12" fill="#3ddc97"/>
+          <text x="80" y="140" class="viz-label">YOUR DEVICE</text>
+          <circle cx="320" cy="250" r="34" class="viz-node"/>
+          <circle cx="320" cy="250" r="12" fill="#3ddc97"/>
+          <text x="320" y="300" class="viz-label">FRIEND'S DEVICE</text>
+          <text x="200" y="150" class="file-tag" text-anchor="middle">raw_footage.mp4 &#183; 12.4 GB</text>
+          <text x="200" y="170" class="viz-label">direct &#183; encrypted &#183; no server</text>
+          <circle class="packet" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" path="M80 90 C 180 40, 220 300, 320 250"/></circle>
+          <circle class="packet" r="4" opacity=".6"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" path="M80 90 C 180 40, 220 300, 320 250"/></circle>
+          <circle class="packet" r="4" opacity=".3"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite" path="M80 90 C 180 40, 220 300, 320 250"/></circle>
+        </svg>
+      </div>
+    </div>
+  </section>
 
   <!-- ============ TRANSFER TOOL ============ -->
   <section class="tool-section" id="tool" aria-label="Transfer tool">
@@ -872,92 +951,92 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
     </div>
   </section>
 
-  <!-- ============ SEO DRAWER (collapsed by default, fully crawlable) ============ -->
-  <section class="seo-drawer" aria-label="About DropP2P">
-    <details class="seo-accordion">
-      <summary class="seo-toggle">📖 About DropP2P, Features &amp; FAQ Guide<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
-      <div class="seo-body">
+  <!-- Ad: top -->
+  <aside class="ad-slot" aria-label="Advertisement">
+    <div class="ad-box" data-s="top"><span class="ad-label">Advertisement</span><span class="ad-hint">Responsive ad slot &mdash; 728&times;90 / 320&times;100</span></div>
+  </aside>
 
-        <section class="section" id="features" aria-labelledby="features-title">
-          <div class="section-head">
-            <p class="kicker">Why DropP2P</p>
-            <h2 id="features-title">A transfer pipe with chat and voice built in</h2>
-            <p class="section-sub">Most file services upload your data to a server, hold it, and hope you pay before it expires. DropP2P skips the warehouse &mdash; your files, messages and voice flow straight from one device to the other.</p>
-          </div>
-          <div class="features-grid">
+  <!-- ============ FEATURES ============ -->
+  <section class="section" id="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Why DropP2P</p>
+        <h2 id="features-title">Built like a pipe, not a warehouse</h2>
+        <p class="section-sub">Most file services upload your data to a server, hold it, and hope you pay before it expires. DropP2P skips the warehouse entirely &mdash; your file flows straight from one device to the other.</p>
+      </div>
+      <div class="features-grid">
         <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg></div>
-          <h3>Unlimited P2P File Transfer</h3>
-          <p>Send files of any size directly from browser to browser. 10 GB of RAW photos or 50 GB of 4K footage &mdash; the ceiling is your own disk, not a subscription tier, because there is no upload destination.</p>
-        </article>
-        <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4"/></svg></div>
-          <h3>Push-to-Talk Walkie-Talkie</h3>
-          <p>Hold one button to talk live to your connected peer, with a live speaker indicator and audio waveform. Unlock the mic for 3 hours with 1 DropCoin or a short ad.</p>
-        </article>
-        <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg></div>
-          <h3>Real-time Chat with Voice Notes</h3>
-          <p>Message your peer in real time and record voice notes, right next to your transfer. Chat and voice travel directly between the two connected browsers.</p>
-        </article>
-        <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
-          <h3>User Profiles &amp; Presence</h3>
-          <p>Pick a display name, @handle and avatar that stay on your device. Use Ghost Mode to appear offline, and mute or block a peer at any time.</p>
-        </article>
-        <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h13M3 12h9M3 17h13"/><path d="M19 9l3 3-3 3"/></svg></div>
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></div>
           <h3>Zero Cloud Storage</h3>
-          <p>Files stream over WebRTC data channels. No copy of your data is written to any server, so there is nothing to breach, expire, or mine for training data.</p>
+          <p>Files are streamed directly between devices over WebRTC data channels. No copy of your data is ever written to any server, so there is nothing to breach, expire, or mine for training data.</p>
         </article>
         <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></div>
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
           <h3>End-to-End Encryption</h3>
           <p>Every WebRTC data channel is mandatorily encrypted with DTLS. The encryption is enforced by the browser itself &mdash; neither DropP2P nor anyone in between can read the stream.</p>
         </article>
         <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
-          <h3>Chunk Streaming Engine</h3>
-          <p>Files are sliced into 64 KB chunks and streamed with <code>bufferedAmount</code> backpressure, so a 50 GB transfer runs smoothly even on a low-RAM phone without loading the file into memory.</p>
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M5 10l7-7 7 7"/></svg></div>
+          <h3>Unlimited File Size</h3>
+          <p>10 GB of RAW photos, 50 GB of 4K B-roll &mdash; the size ceiling is your own disk, not a subscription tier. There is no upload cap because there is no upload destination.</p>
         </article>
         <article class="feature-card">
-          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M8 19h4"/><rect x="18" y="8" width="4" height="11" rx="1"/></svg></div>
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+          <h3>Chunk Streaming Engine</h3>
+          <p>Files are sliced into 64 KB chunks and streamed sequentially with <code>bufferedAmount</code> backpressure, so a 50 GB transfer runs smoothly even on a low-RAM phone without ever loading the file into memory.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
           <h3>Cross-Device Compatibility</h3>
           <p>Phone to PC, PC to tablet, Android to iPhone &mdash; if it runs a modern browser, it can send or receive. No app install, no account, no cable.</p>
         </article>
-          </div>
-        </section>
+      </div>
+    </div>
+  </section>
 
-        <section class="section" id="how-it-works" aria-labelledby="how-title">
-          <div class="section-head">
-            <p class="kicker">How it works</p>
-            <h2 id="how-title">From your device to theirs, in five stages</h2>
-          </div>
-          <ol class="steps" style="list-style:none">
-        <li class="step"><div class="step-num">1</div><div class="step-body"><h3>Set up your profile</h3><p>Optionally choose a display name, @handle and avatar. They are stored only on your device.</p></div></li>
-        <li class="step"><div class="step-num">2</div><div class="step-body"><h3>Send or receive</h3><p>Drop any file on the Files tab, then share the 6-digit room code, QR code, or one-click link. The receiver just enters the code.</p></div></li>
-        <li class="step"><div class="step-num">3</div><div class="step-body"><h3>Real-time P2P handshake</h3><p>STUN punches through NAT; a TURN relay steps in only when firewalls are strict. A direct encrypted channel opens.</p></div></li>
-        <li class="step"><div class="step-num">4</div><div class="step-body"><h3>Transfer, chat or talk</h3><p>Files stream as 64 KB chunks with live speed and ETA. While connected you can also use Chat with voice notes or the Push-to-Talk Walkie-Talkie.</p></div></li>
-        <li class="step"><div class="step-num">5</div><div class="step-body"><h3>Secure download</h3><p>After a brief finalization screen, the file is reassembled locally and saved &mdash; the channel then closes for good.</p></div></li>
-          </ol>
-        </section>
+  <!-- Ad: mid -->
+  <aside class="ad-slot" aria-label="Advertisement">
+    <div class="ad-box" data-s="mid"><span class="ad-label">Advertisement</span><span class="ad-hint">Responsive ad slot &mdash; in-content</span></div>
+  </aside>
 
-        <section class="section" id="limitations" aria-labelledby="limit-title">
-          <div class="limit-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
-            <div style="min-width:0">
-              <h3 id="limit-title">One honest limitation you should know</h3>
-              <p>Because DropP2P streams files directly between devices with <strong>no intermediate server storage</strong>, both the sender and the receiver must remain online with this page open at the same time, for the entire duration of the transfer. If either side disconnects mid-transfer, the transfer must be restarted. This is the trade-off for unlimited size, zero storage, and full privacy &mdash; and for most direct handoffs, it is exactly what you want.</p>
-            </div>
-          </div>
-        </section>
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="section" id="how-it-works" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">How it works</p>
+        <h2 id="how-title">From your device to theirs, in five stages</h2>
+      </div>
+      <ol class="steps" style="list-style:none">
+        <li class="step"><div class="step-num">1</div><div class="step-body"><h3>Select File</h3><p>Drag and drop any file onto the send panel. It stays on your device &mdash; nothing is uploaded.</p></div></li>
+        <li class="step"><div class="step-num">2</div><div class="step-body"><h3>Share 6-Digit Code</h3><p>DropP2P generates a room code, QR code, and one-click link. Send it to your friend however you like.</p></div></li>
+        <li class="step"><div class="step-num">3</div><div class="step-body"><h3>Real-time P2P Handshake</h3><p>STUN punches through NAT; a TURN relay steps in only when firewalls are strict. A direct encrypted channel opens.</p></div></li>
+        <li class="step"><div class="step-num">4</div><div class="step-body"><h3>High-Speed Stream</h3><p>The file streams as 64 KB chunks with backpressure control. Live speed and ETA are shown on both devices.</p></div></li>
+        <li class="step"><div class="step-num">5</div><div class="step-body"><h3>Secure Download</h3><p>After a brief finalization screen, the file is reassembled locally and saved &mdash; the channel then closes for good.</p></div></li>
+      </ol>
+    </div>
+  </section>
 
-        <section class="section" id="faq" aria-labelledby="faq-title">
-          <div class="section-head">
-            <p class="kicker">FAQ</p>
-            <h2 id="faq-title">Frequently asked questions</h2>
-          </div>
-          <div class="faq-list">
+  <!-- ============ HONEST LIMITATIONS ============ -->
+  <section class="section" id="limitations" aria-labelledby="limit-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="limit-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div style="min-width:0">
+          <h3 id="limit-title">One honest limitation you should know</h3>
+          <p>Because DropP2P streams files directly between devices with <strong>no intermediate server storage</strong>, both the sender and the receiver must remain online with this page open at the same time, for the entire duration of the transfer. If either side disconnects mid-transfer, the transfer must be restarted. This is the trade-off for unlimited size, zero storage, and full privacy &mdash; and for most direct handoffs, it is exactly what you want.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head" style="margin-left:auto;margin-right:auto;text-align:center">
+        <p class="kicker">FAQ</p>
+        <h2 id="faq-title">Frequently asked questions</h2>
+      </div>
+      <div class="faq-list">
         <details><summary>Does DropP2P store my files on a server?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No. DropP2P has no cloud storage at all. Your file is streamed directly from your device to the other person's device over an encrypted WebRTC connection, so no copy ever exists on our infrastructure.</div></details>
         <details><summary>Can I send files between different cities or networks?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. DropP2P uses Google's public STUN servers plus free TURN relay fallback, so connections succeed across different Wi-Fi networks, 4G and 5G, even behind strict NATs and firewalls.</div></details>
         <details><summary>Is there a file size limit?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No. Files are sliced into 64 KB chunks and streamed sequentially with memory-safe backpressure, so transfers of 10 GB, 50 GB or more work as long as both devices have enough free disk space for the final download.</div></details>
@@ -967,13 +1046,15 @@ details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1
         <details><summary>Is the transfer encrypted?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. All WebRTC data channels are encrypted with DTLS (Datagram Transport Layer Security) by default, so the data is encrypted in transit between the two devices.</div></details>
         <details><summary>Do I need to create an account?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No registration, no email, no sign-up. Generate a 6-digit code, share it, and start transferring immediately.</div></details>
         <details><summary>Which browsers are supported?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Any modern browser with WebRTC support: Chrome, Edge, Firefox, Safari, Opera, and their mobile versions.</div></details>
-        <details><summary>Can I chat or talk to the person I am connected to?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. Besides unlimited P2P file transfer, the workspace includes real-time chat with voice notes and a Push-to-Talk Walkie-Talkie. You can set a display name, @handle and avatar (stored only on your device), mute or block a peer, and use Ghost Mode to appear offline. Chat and Walkie-Talkie unlock for 3 hours with 1 DropCoin or a short ad.</div></details>
-          </div>
-        </section>
-
+        <details><summary>How is DropP2P free?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">WebRTC infrastructure is free to use and files never touch a server, so running costs are near zero. The service is supported by non-intrusive ads, including a single short ad before your final download.</div></details>
       </div>
-    </details>
+    </div>
   </section>
+
+  <!-- Ad: foot -->
+  <aside class="ad-slot" aria-label="Advertisement">
+    <div class="ad-box" data-s="foot"><span class="ad-label">Advertisement</span><span class="ad-hint">Responsive ad slot &mdash; footer</span></div>
+  </aside>
 </main>
 
 <!-- ============ FOOTER ============ -->
@@ -1700,18 +1781,6 @@ function finalizeDownload() {
   }
 
   window.DropUI = { addMessage, setCoins, getCoins: () => coins, setPeer, setSpeaking, requestConsent, openVault, selectTab: id => { const b = tabs.find(t => t.dataset.tab === id); if (b) selectTab(b); } };
-})();
-</script>
-<script id="drawer-ui">
-/* Opens the SEO drawer when a footer/anchor link targets content inside it */
-(function () {
-  var d = document.querySelector('.seo-accordion'); if (!d) return;
-  function reveal() {
-    var h = location.hash; if (h.length < 2) return; var t;
-    try { t = document.querySelector(h); } catch (e) { return; }
-    if (t && d.contains(t)) { d.open = true; setTimeout(function () { t.scrollIntoView(); }, 60); }
-  }
-  window.addEventListener('hashchange', reveal); reveal();
 })();
 </script>
 </body>
