@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>DropP2P — Direct Large File Transfer Online (No Size Limit)</title>
+<meta name="description" content="Send large files directly from browser to browser. Free P2P encrypted file sharing with zero cloud uploads, unlimited file size, and no registration required.">
+<link rel="canonical" href="https://dropp2p.pages.dev/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0b0d">
+
+<!-- OpenGraph -->
+<meta property="og:title" content="DropP2P — Direct Large File Transfer Online (No Size Limit)">
+<meta property="og:description" content="Send large files directly from browser to browser. Free P2P encrypted file sharing with zero cloud uploads, unlimited file size, and no registration required.">
+<meta property="og:url" content="https://dropp2p.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DropP2P">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DropP2P — Direct Large File Transfer Online (No Size Limit)">
+<meta name="twitter:description" content="Send large files directly from browser to browser. Free P2P encrypted file sharing with zero cloud uploads, unlimited file size, and no registration required.">
+
+<!-- Structured Data: WebApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "DropP2P",
+  "url": "https://dropp2p.pages.dev/",
+  "description": "Send large files directly from browser to browser. Free P2P encrypted file sharing with zero cloud uploads, unlimited file size, and no registration required.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires a modern browser with WebRTC support",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "isAccessibleForFree": true,
+  "featureList": [
+    "Peer-to-peer file transfer via WebRTC data channels",
+    "Zero cloud storage — files never touch a server",
+    "Unlimited file size with 64 KB chunk streaming",
+    "End-to-end encrypted via DTLS",
+    "Cross-city connections with STUN and TURN fallback",
+    "6-digit room code and QR code pairing",
+    "Screen Wake Lock protection on mobile",
+    "No registration required"
+  ]
+}
+</script>
+
+<!-- Structured Data: FAQPage (matches visible on-page FAQ exactly) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does DropP2P store my files on a server?", "acceptedAnswer": { "@type": "Answer", "text": "No. DropP2P has no cloud storage at all. Your file is streamed directly from your device to the other person's device over an encrypted WebRTC connection, so no copy ever exists on our infrastructure." } },
+    { "@type": "Question", "name": "Can I send files between different cities or networks?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. DropP2P uses Google's public STUN servers plus free TURN relay fallback, so connections succeed across different Wi-Fi networks, 4G and 5G, even behind strict NATs and firewalls." } },
+    { "@type": "Question", "name": "Is there a file size limit?", "acceptedAnswer": { "@type": "Answer", "text": "No. Files are sliced into 64 KB chunks and streamed sequentially with memory-safe backpressure, so transfers of 10 GB, 50 GB or more work as long as both devices have enough free disk space for the final download." } },
+    { "@type": "Question", "name": "Do both people need to be online at the same time?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Because files are streamed directly between devices with no intermediate server storage, the sender and receiver must both keep the page open for the duration of the transfer." } },
+    { "@type": "Question", "name": "Does DropP2P work on phones?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. It works in modern mobile browsers. When a transfer starts, the Screen Wake Lock API keeps the screen awake, but you should still keep the tab in the foreground for the best speeds." } },
+    { "@type": "Question", "name": "What happens if I lock my phone screen mid-transfer?", "acceptedAnswer": { "@type": "Answer", "text": "The Wake Lock keeps the screen on while the tab is visible, but some aggressive phone manufacturers may still pause network activity in the background. Keep the screen unlocked and the tab open until the transfer finishes." } },
+    { "@type": "Question", "name": "Is the transfer encrypted?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. All WebRTC data channels are encrypted with DTLS (Datagram Transport Layer Security) by default, so the data is encrypted in transit between the two devices." } },
+    { "@type": "Question", "name": "Do I need to create an account?", "acceptedAnswer": { "@type": "Answer", "text": "No registration, no email, no sign-up. Generate a 6-digit code, share it, and start transferring immediately." } },
+    { "@type": "Question", "name": "Which browsers are supported?", "acceptedAnswer": { "@type": "Answer", "text": "Any modern browser with WebRTC support: Chrome, Edge, Firefox, Safari, Opera, and their mobile versions." } },
+    { "@type": "Question", "name": "How is DropP2P free?", "acceptedAnswer": { "@type": "Answer", "text": "WebRTC infrastructure is free to use and files never touch a server, so running costs are near zero. The service is supported by non-intrusive ads, including a single short ad before your final download." } }
+  ]
+}
+</script>
+
+<style>
+/* =====================================================
+   DropP2P — Design system
+   Spacing scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 (+64, 96 for sections)
+===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b0c0e;
+  --surface: #131418;
+  --surface-2: #1a1b20;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-soft: rgba(255, 255, 255, 0.05);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #f4f5f7;
+  --text-dim: #a1a5b0;
+  --text-faint: #71757f;
+  --accent: #3ddc97;
+  --accent-hover: #5ae8ad;
+  --accent-ink: #062b1c;
+  --accent-soft: rgba(61, 220, 151, 0.1);
+  --accent-line: rgba(61, 220, 151, 0.28);
+  --danger: #ff6b6b;
+  --amber: #ffc857;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+  --r-sm: 10px; --r-md: 12px; --r: 16px; --radius: 16px;
+  --maxw: 1120px;
+  --gutter: 16px;
+  --header-h: 56px;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+@media (min-width: 768px) { :root { --gutter: 24px; --header-h: 64px; } }
+
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+a { color: var(--accent); }
+img, svg { display: block; max-width: 100%; }
+button, input { font-family: inherit; font-size: inherit; color: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+h1, h2, h3, p, span, li, label, summary, .text-wrap { min-width: 0; overflow-wrap: break-word; }
+p { color: var(--text-dim); font-size: 15px; line-height: 1.65; }
+strong { color: var(--text); font-weight: 600; }
+
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+.skip {
+  position: absolute; left: -999px; top: 0; z-index: 500;
+  background: var(--accent); color: var(--accent-ink);
+  padding: var(--s3) var(--s4); font-weight: 700; border-radius: var(--r-sm);
+}
+.skip:focus { left: var(--s3); top: var(--s3); }
+
+/* =====================================================
+   HEADER — 3 zones: [Logo] [Spacer] [Coins + Profile + Ghost]
+===================================================== */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(11, 12, 14, 0.8);
+  backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: var(--s3);
+  width: 100%; max-width: 1120px; min-height: var(--header-h); margin: 0 auto; padding: 0 var(--gutter);
+  overflow: visible; min-width: 0;
+}
+.logo {
+  display: inline-flex; flex-direction: row; align-items: center; flex-shrink: 0; gap: var(--s2);
+  white-space: nowrap; min-height: var(--header-h);
+  font-weight: 700; font-size: 17px; line-height: 1; letter-spacing: -0.02em; color: var(--text); text-decoration: none;
+}
+.logo [data-brand] { white-space: nowrap; writing-mode: horizontal-tb; }
+.logo-mark { width: 28px; height: 28px; color: var(--accent); flex: none; }
+.header-spacer { flex: 1 1 0; min-width: 0; }
+
+/* =====================================================
+   APP TITLE BAR (replaces the marketing hero)
+===================================================== */
+.app-bar { display: flex; justify-content: center; padding: var(--s5) var(--gutter) 0; min-width: 0; }
+.app-title {
+  display: inline-flex; align-items: center; gap: var(--s2); max-width: 100%; margin: 0;
+  padding: 6px var(--s4); font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: 0.01em; text-align: center;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: 999px;
+}
+.app-title .dot { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Rewarded-ad placeholder (used inside modals only) */
+.ad-box {
+  border: 1px dashed var(--line-strong); border-radius: var(--r); background: var(--surface);
+  min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: var(--s3); text-align: center;
+}
+.ad-box .ad-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint); }
+.ad-box .ad-hint { font-size: 12px; color: var(--text-faint); }
+
+/* =====================================================
+   TRANSFER TOOL CARD — centred, focused column
+===================================================== */
+.tool-section { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: var(--s4) var(--gutter); }
+.tool-card-glow {
+  width: 100%; max-width: 680px; margin: 0 auto; min-width: 0; padding: 1px; border-radius: 17px;
+  background: linear-gradient(145deg, rgba(61, 220, 151, 0.4), rgba(255, 255, 255, 0.06) 45%, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 80px rgba(61, 220, 151, 0.05);
+}
+.tool-card { background: var(--surface); border-radius: 16px; padding: var(--s5) var(--s4); width: 100%; min-width: 0; }
+@media (min-width: 768px) { .tool-card { padding: var(--s6); } }
+
+.mode-toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--s1);
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: var(--s1); margin-bottom: var(--s5);
+}
+.mode-btn {
+  min-height: 44px; border: 0; background: transparent; color: var(--text-dim);
+  font-weight: 600; font-size: 15px; border-radius: var(--r-sm); cursor: pointer;
+  padding: 0 var(--s3); transition: background .2s, color .2s, box-shadow .2s, transform .1s;
+}
+.mode-btn:hover { color: var(--text); }
+.mode-btn:active { transform: scale(0.98); }
+.mode-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 2px 12px rgba(61, 220, 151, 0.3); }
+
+.panel { display: none; min-width: 0; }
+.panel.active { display: flex; flex-direction: column; animation: fadein .3s; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.dropzone {
+  display: flex; flex-direction: column; align-items: center; gap: var(--s2); width: 100%; min-width: 0;
+  border: 1.5px dashed var(--line-strong); border-radius: var(--r); background: rgba(255, 255, 255, 0.015);
+  padding: var(--s7) var(--s5); text-align: center; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.dropzone:hover, .dropzone.dragover { border-color: var(--accent); background: var(--accent-soft); }
+.dropzone svg { width: 40px; height: 40px; color: var(--accent); margin-bottom: var(--s1); }
+.dropzone strong { display: block; font-size: 16px; line-height: 1.4; color: var(--text); }
+.dropzone > span:not(.btn-choose) { font-size: 14px; line-height: 1.6; color: var(--text-dim); max-width: 44ch; }
+.dropzone .btn-choose {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: var(--s3); min-height: 48px; padding: 0 var(--s6); border-radius: var(--r-md);
+  background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 700; line-height: 1;
+  pointer-events: none; box-shadow: 0 2px 12px rgba(61, 220, 151, 0.25);
+}
+
+.file-pill {
+  display: none; align-items: center; gap: var(--s3); min-width: 0; margin-top: var(--s4);
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s3) var(--s4);
+}
+.file-pill.show { display: flex; }
+.file-pill svg { width: 24px; height: 24px; color: var(--accent); flex: none; }
+.file-pill .fp-meta { min-width: 0; flex: 1; }
+.file-pill .fp-name { font-weight: 600; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; color: var(--text); }
+.file-pill .fp-size { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+.room-display { display: none; flex-direction: column; margin-top: var(--s5); min-width: 0; }
+.room-display.show { display: flex; animation: fadein .3s; }
+.status-line {
+  display: flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 24px; min-width: 0; font-size: 14px; line-height: 1.5; color: var(--text-dim); text-align: center;
+}
+.status-line .spin {
+  width: 14px; height: 14px; border: 2px solid var(--line-strong); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .8s linear infinite; flex: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.room-code-card {
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r);
+  padding: var(--s5) var(--s4); margin: var(--s4) 0; text-align: center;
+}
+.room-code {
+  font-family: var(--mono); font-size: clamp(1.75rem, 9vw, 2.5rem); font-weight: 700; line-height: 1.2;
+  letter-spacing: 0.2em; padding-left: 0.2em; color: var(--accent); user-select: all; word-break: break-all;
+}
+.code-card-label { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); margin-bottom: var(--s2); }
+
+.share-row { display: flex; flex-direction: column; gap: var(--s3); margin-bottom: var(--s4); min-width: 0; }
+@media (min-width: 560px) { .share-row { flex-direction: row; } }
+.share-row input {
+  flex: 1; min-width: 0; min-height: 48px; padding: 0 var(--s4);
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md);
+  color: var(--text-dim); font-family: var(--mono); font-size: 16px; text-overflow: ellipsis;
+}
+@media (min-width: 560px) { .share-row input { font-size: 13px; } }
+.share-row input:focus { border-color: var(--accent); outline: none; }
+.qr-wrap {
+  display: flex; justify-content: center; width: fit-content; max-width: 100%;
+  margin: 0 auto var(--s3); padding: var(--s4); background: #fff; border-radius: var(--r);
+}
+.hint { font-size: 13px; line-height: 1.6; color: var(--text-faint); text-align: center; margin-top: var(--s3); }
+
+.field-label { display: block; margin-bottom: var(--s3); font-size: 15px; font-weight: 600; text-align: center; color: var(--text); }
+.code-input {
+  width: 100%; min-height: 64px; padding: 0 var(--s3);
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md);
+  color: var(--accent); font-family: var(--mono); font-size: 1.5rem; font-weight: 600;
+  letter-spacing: 0.3em; text-indent: 0.3em; text-align: center; text-transform: uppercase;
+  transition: border-color .2s, box-shadow .2s;
+}
+.code-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(61, 220, 151, 0.15); }
+.code-input::placeholder { color: var(--text-faint); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 48px; padding: var(--s3) var(--s5); border: 0; border-radius: var(--r-md); cursor: pointer;
+  font-size: 15px; font-weight: 600; line-height: 1.2; white-space: nowrap;
+  transition: background .2s, border-color .2s, color .2s, transform .1s, box-shadow .2s;
+}
+.btn:active { transform: scale(0.98); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: 0 2px 12px rgba(61, 220, 151, 0.25); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:disabled { background: var(--surface-2); color: var(--text-faint); cursor: not-allowed; box-shadow: none; transform: none; }
+.btn-ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.btn-block { width: 100%; margin-top: var(--s4); }
+
+.progress-zone { display: none; margin-top: var(--s5); padding-top: var(--s5); border-top: 1px solid var(--line); min-width: 0; }
+.progress-zone.show { display: flex; flex-direction: column; animation: fadein .3s; }
+.pz-file { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: var(--s3); overflow-wrap: anywhere; color: var(--text); }
+.progress-track { width: 100%; height: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2fc785, var(--accent)); border-radius: 99px; transition: width .25s; }
+.pz-stats {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s2) var(--s4);
+  margin-top: var(--s3); font-family: var(--mono); font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums;
+}
+.wake-badge {
+  display: none; align-items: center; gap: var(--s2); min-height: 44px; margin-top: var(--s4);
+  padding: var(--s2) var(--s3); font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--amber);
+  border: 1px solid rgba(255, 200, 87, 0.3); background: rgba(255, 200, 87, 0.07); border-radius: var(--r-sm);
+}
+.wake-badge.show { display: flex; }
+.wake-badge svg { width: 16px; height: 16px; flex: none; }
+
+/* =====================================================
+   CONTENT SECTIONS
+===================================================== */
+.section { width: 100%; min-width: 0; padding: var(--s8) 0; }
+@media (min-width: 768px) { .section { padding: var(--s9) 0; } }
+.section-head { max-width: 640px; margin-bottom: var(--s7); min-width: 0; }
+.kicker { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: var(--s3); }
+h2 { font-size: clamp(1.5rem, 5vw, 2.25rem); line-height: 1.2; letter-spacing: -0.03em; font-weight: 800; margin-bottom: var(--s3); text-wrap: balance; }
+.section-sub { font-size: 15px; }
+
+.features-grid { display: grid; grid-template-columns: 1fr; gap: var(--s4); width: 100%; min-width: 0; }
+@media (min-width: 768px) { .features-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--s5); } }
+.feature-card {
+  display: flex; flex-direction: column; gap: var(--s3); min-width: 0; padding: var(--s5);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  transition: border-color .2s, transform .2s, background .2s;
+}
+.feature-card:hover { border-color: var(--accent-line); background: #15161b; transform: translateY(-2px); }
+.feature-card .f-icon {
+  width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-md); background: var(--accent-soft); border: 1px solid var(--accent-line);
+}
+.feature-card .f-icon svg { width: 22px; height: 22px; color: var(--accent); }
+.feature-card h3 { font-size: 16px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
+.feature-card p { font-size: 14px; }
+.feature-card code { font-family: var(--mono); font-size: 0.85em; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 6px; }
+
+/* Steps — vertical timeline on mobile, 5 columns on desktop */
+.steps { display: flex; flex-direction: column; gap: var(--s5); width: 100%; min-width: 0; list-style: none; }
+.step { position: relative; display: flex; flex-direction: row; gap: var(--s4); min-width: 0; }
+.step:not(:last-child)::after {
+  content: ''; position: absolute; left: 23px; top: 52px; bottom: -20px; width: 2px;
+  background: linear-gradient(var(--line-strong), var(--line-soft)); border-radius: 2px;
+}
+.step-num {
+  width: 48px; height: 48px; flex: none; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--surface-2); border: 1px solid var(--accent-line);
+  font-family: var(--mono); font-weight: 700; color: var(--accent);
+}
+.step-body { min-width: 0; padding-top: var(--s2); }
+.step h3 { font-size: 16px; font-weight: 600; line-height: 1.35; margin-bottom: var(--s1); }
+.step p { font-size: 14px; }
+@media (min-width: 900px) {
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s5); }
+  .step { flex-direction: column; gap: var(--s4); }
+  .step:not(:last-child)::after { left: 60px; right: -12px; top: 23px; bottom: auto; width: auto; height: 2px; }
+  .step-body { padding-top: 0; }
+}
+
+.limit-box {
+  display: flex; flex-direction: column; gap: var(--s4); width: 100%; min-width: 0; padding: var(--s5);
+  background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: var(--r);
+}
+@media (min-width: 768px) { .limit-box { flex-direction: row; gap: var(--s5); padding: var(--s6); } }
+.limit-box svg { width: 24px; height: 24px; color: var(--amber); flex: none; }
+.limit-box h3 { font-size: 16px; font-weight: 600; line-height: 1.35; margin-bottom: var(--s2); }
+.limit-box p { font-size: 15px; }
+
+.faq-list { display: flex; flex-direction: column; gap: var(--s3); width: 100%; max-width: 800px; margin: 0 auto; min-width: 0; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; min-width: 0; transition: border-color .2s; }
+details:hover { border-color: var(--line-strong); }
+details[open] { border-color: var(--accent-line); }
+summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  min-height: 56px; padding: var(--s3) var(--s4); cursor: pointer; list-style: none;
+  font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--text); transition: color .2s;
+}
+summary::-webkit-details-marker { display: none; }
+summary:hover { color: var(--accent); }
+summary:focus-visible { outline-offset: -2px; }
+summary .chev { width: 20px; height: 20px; flex: none; color: var(--text-faint); transition: transform .3s ease, color .2s; }
+details[open] summary .chev { transform: rotate(180deg); color: var(--accent); }
+details .faq-a { padding: 0 var(--s4) var(--s4); font-size: 15px; line-height: 1.65; color: var(--text-dim); animation: faq-expand .3s ease; }
+@keyframes faq-expand { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* =====================================================
+   FOOTER
+===================================================== */
+.site-footer { border-top: 1px solid var(--line); margin-top: var(--s5); padding: var(--s6) 0 calc(var(--s6) + env(safe-area-inset-bottom, 0px)); }
+.footer-inner { display: flex; flex-direction: column; gap: var(--s4); align-items: stretch; min-width: 0; }
+@media (min-width: 900px) { .footer-inner { flex-direction: row; align-items: center; justify-content: space-between; gap: var(--s6); } }
+.footer-inner p { font-size: 13px; color: var(--text-faint); }
+.footer-links { display: flex; flex-wrap: wrap; gap: 0 var(--s5); }
+.footer-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; color: var(--text-dim); text-decoration: none; transition: color .2s; overflow-wrap: anywhere; }
+.footer-links a:hover { color: var(--accent); }
+
+/* =====================================================
+   AD-GATE MODAL + TOAST
+===================================================== */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 300; width: 100%; display: none; align-items: center; justify-content: center;
+  padding: var(--s4); background: rgba(5, 6, 7, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  width: 100%; max-width: 440px; max-height: calc(100dvh - 32px); overflow-y: auto; text-align: center;
+  padding: var(--s6) var(--s5); background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: var(--r); box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6); animation: fadein .3s;
+}
+.modal .check-ring { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--s4); border-radius: 50%; background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.modal .check-ring svg { width: 28px; height: 28px; color: var(--accent); }
+.modal h3 { font-size: 20px; font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: var(--s2); }
+.modal .modal-sub { font-size: 14px; color: var(--text-dim); margin-bottom: var(--s3); }
+.countdown { font-family: var(--mono); font-size: 3rem; font-weight: 700; line-height: 1.1; color: var(--accent); margin: var(--s2) 0 var(--s4); font-variant-numeric: tabular-nums; }
+.modal .ad-box { min-height: 110px; margin-bottom: var(--s4); }
+.progress-track.mini { height: 6px; }
+.paused-note { min-height: 20px; margin: var(--s3) 0 0; font-size: 13px; color: var(--amber); }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--s5) + env(safe-area-inset-bottom, 0px)); z-index: 400;
+  transform: translateX(-50%) translateY(16px); max-width: calc(100vw - 32px); min-width: 0;
+  padding: var(--s3) var(--s4); font-size: 14px; font-weight: 500; line-height: 1.4; text-align: center;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--accent-line); border-radius: var(--r-md);
+  box-shadow: var(--shadow-2); opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 359px) {
+  :root { --gutter: 12px; }
+  .tool-card { padding: var(--s4) var(--s3); }
+  .dropzone { padding: var(--s6) var(--s4); }
+  .code-input { letter-spacing: 0.2em; text-indent: 0.2em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* =====================================================
+   v2 — WORKSPACE DASHBOARD, HEADER ACTIONS, MODALS
+===================================================== */
+[hidden] { display: none !important; }
+
+.avatar {
+  width: 32px; height: 32px; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden; background: var(--accent-soft); border: 1px solid var(--accent-line);
+  color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+  background-size: cover; background-position: center;
+}
+.avatar.sm { width: 28px; height: 28px; font-size: 11px; }
+.avatar.lg { width: 56px; height: 56px; font-size: 18px; }
+
+/* Header actions */
+.header-actions { display: flex; align-items: center; gap: var(--s2); min-width: 0; }
+.coin-pill {
+  display: inline-flex; align-items: center; gap: var(--s1); min-height: 44px; padding: 0 var(--s1) 0 var(--s3);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+.coin-text b { font-variant-numeric: tabular-nums; color: var(--text); }
+.coin-label { color: var(--text-dim); font-weight: 500; }
+.coin-earn {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 36px; padding: 0 var(--s3); margin-left: var(--s1);
+  background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .2s, transform .1s;
+}
+.coin-earn:hover { background: var(--accent-hover); }
+.coin-earn:active { transform: scale(0.96); }
+.profile-capsule { display: inline-flex; align-items: center; gap: var(--s1); min-width: 0; padding: 0 var(--s1); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
+.profile-btn { display: inline-flex; align-items: center; gap: var(--s2); min-height: 44px; min-width: 44px; padding: 0 var(--s1); background: transparent; border: 0; border-radius: 999px; cursor: pointer; color: var(--text); min-width: 0; }
+.profile-btn:hover .p-name { color: var(--accent); }
+.profile-text { display: none; flex-direction: column; align-items: flex-start; line-height: 1.2; min-width: 0; text-align: left; }
+.p-name { font-size: 13px; font-weight: 600; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color .2s; }
+.p-handle { font-size: 11px; color: var(--text-faint); font-family: var(--mono); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.presence-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 var(--s2); background: transparent; border: 0; border-radius: 999px; cursor: pointer; color: var(--text-dim); font-size: 12px; font-weight: 600; transition: color .2s, background .2s; }
+.presence-toggle:hover { background: var(--surface-2); color: var(--text); }
+.presence-label { display: none; white-space: nowrap; }
+.presence-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--accent); box-shadow: 0 0 0 0 rgba(61, 220, 151, .6); animation: presence 2s infinite; }
+@keyframes presence { 70% { box-shadow: 0 0 0 6px rgba(61, 220, 151, 0); } 100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); } }
+.presence-toggle[aria-pressed="true"] .presence-dot { background: var(--text-faint); animation: none; }
+.presence-toggle[aria-pressed="true"] { color: var(--text); }
+@media (max-width: 479px) { .coin-label, .earn-label { display: none; } .coin-pill { padding-left: var(--s2); } }
+@media (min-width: 560px) { .presence-label { display: inline; } }
+@media (min-width: 640px) { .profile-text { display: flex; } }
+
+/* Workspace shell */
+.ws-tabs {
+  display: flex; gap: var(--s1); padding: var(--s1); margin-bottom: var(--s5); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md);
+}
+.ws-tabs::-webkit-scrollbar { display: none; }
+.ws-tab {
+  flex: 1 0 auto; scroll-snap-align: center; display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 48px; padding: 0 var(--s4); background: transparent; border: 0; border-radius: var(--r-sm); cursor: pointer;
+  color: var(--text-dim); font-size: 14px; font-weight: 600; white-space: nowrap; transition: background .2s, color .2s, box-shadow .2s, transform .1s;
+}
+.ws-tab:hover { color: var(--text); }
+.ws-tab:active { transform: scale(0.98); }
+.ws-tab[aria-selected="true"] { background: var(--surface-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--accent-line), var(--shadow-1); }
+.ws-tab[aria-selected="true"] .t-ico { filter: none; }
+.t-ico { font-size: 16px; line-height: 1; }
+@media (min-width: 768px) { .ws-tab { flex: 1 1 0; } }
+.ws-panel { display: none; min-width: 0; width: 100%; }
+.ws-panel.active { display: block; animation: fadein .3s; }
+.sub-toggle { margin-bottom: var(--s4); }
+.mode-btn { min-height: 48px; }
+
+/* Chat */
+.chat-shell { position: relative; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg); overflow: hidden; }
+.chat-head { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); background: var(--surface-2); border-bottom: 1px solid var(--line); min-width: 0; }
+.chat-head-meta { min-width: 0; }
+.ch-name { font-size: 14px; font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-sub { font-size: 12px; color: var(--text-faint); line-height: 1.3; }
+.chat-viewport {
+  display: flex; flex-direction: column; gap: var(--s3); height: 340px; max-height: 55vh; overflow-y: auto; padding: var(--s4);
+  scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; overscroll-behavior: contain;
+}
+.chat-viewport::-webkit-scrollbar { width: 8px; }
+.chat-viewport::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; border: 2px solid var(--bg); }
+.chat-empty { margin: auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--s2); color: var(--text-faint); font-size: 14px; max-width: 28ch; }
+.chat-empty > span { font-size: 28px; }
+.msg { display: flex; gap: var(--s2); align-items: flex-end; max-width: 88%; min-width: 0; }
+.msg.me { align-self: flex-end; flex-direction: row-reverse; }
+.bubble { min-width: 0; padding: var(--s2) var(--s3); border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.msg.me .bubble { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); border-bottom-left-radius: 14px; border-bottom-right-radius: 4px; }
+.msg-meta { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); font-size: 11px; margin-bottom: 2px; color: var(--text-faint); }
+.msg-name { font-weight: 600; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg.me .msg-meta, .msg.me .msg-name { color: rgba(6, 43, 28, 0.7); }
+.msg-body { font-size: 14px; line-height: 1.5; color: inherit; overflow-wrap: anywhere; white-space: pre-wrap; }
+.msg.me .msg-body { color: var(--accent-ink); }
+.composer-wrap { position: relative; border-top: 1px solid var(--line); background: var(--surface); }
+.composer { display: flex; align-items: center; gap: var(--s2); padding: var(--s3); }
+.composer-input { flex: 1; min-width: 0; min-height: 48px; padding: 0 var(--s4); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; color: var(--text); font-size: 16px; transition: border-color .2s, box-shadow .2s; }
+.composer-input::placeholder { color: var(--text-faint); }
+.composer-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61, 220, 151, .15); }
+.icon-btn { flex: none; width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px solid var(--line); border-radius: 50%; color: var(--text-dim); cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .1s; }
+.icon-btn svg { width: 20px; height: 20px; }
+.icon-btn:hover { color: var(--accent); border-color: var(--accent-line); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.icon-btn-primary:hover { background: var(--accent-hover); color: var(--accent-ink); }
+.icon-btn[aria-pressed="true"] { background: rgba(255, 107, 107, .15); border-color: var(--danger); color: var(--danger); }
+.rec-indicator { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4) 0; font-size: 13px; color: var(--text-dim); }
+.rec-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); animation: pulse 1s infinite; flex: none; }
+.rec-time { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text); }
+.rec-hint { margin-left: auto; font-size: 12px; color: var(--text-faint); }
+.wave-bars { display: inline-flex; align-items: center; gap: 3px; height: 24px; }
+.wave-bars i { display: block; width: 3px; height: 100%; background: var(--danger); border-radius: 2px; transform-origin: center; animation: bar 0.9s ease-in-out infinite; }
+.wave-bars i:nth-child(2n) { animation-delay: .15s; } .wave-bars i:nth-child(3n) { animation-delay: .3s; } .wave-bars i:nth-child(5n) { animation-delay: .45s; }
+@keyframes bar { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+
+/* Lock overlay */
+.lock-overlay {
+  position: absolute; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; padding: var(--s4);
+  background: rgba(11, 12, 14, 0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.lock-overlay.show { display: flex; }
+.lock-card { width: 100%; max-width: 320px; padding: var(--s5); text-align: center; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r); box-shadow: var(--shadow-2); }
+.lock-ico { font-size: 28px; margin-bottom: var(--s2); }
+.lock-card h3 { font-size: 16px; line-height: 1.3; margin-bottom: var(--s1); }
+.lock-card p { font-size: 13px; margin-bottom: var(--s4); }
+.lock-actions { display: flex; flex-direction: column; gap: var(--s2); }
+.lock-actions .btn { width: 100%; }
+
+/* Walkie-talkie */
+.walkie-shell { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: var(--s4); padding: var(--s4); min-width: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg); overflow: hidden; min-height: 420px; }
+.speaker-banner { display: flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 44px; padding: var(--s2) var(--s4); font-size: 14px; font-weight: 500; text-align: center; color: var(--text-dim); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); transition: border-color .2s, color .2s, background .2s; }
+.speaker-banner .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.speaker-banner.live { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.speaker-banner.live .live-dot { background: var(--accent); animation: pulse 1s infinite; }
+.wave-canvas { width: 100%; height: 96px; display: block; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+.ptt-stage { display: flex; align-items: center; justify-content: center; padding: var(--s4) 0; }
+.ptt-btn { position: relative; width: 168px; height: 168px; border: 0; background: transparent; border-radius: 50%; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.ptt-core {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s1); border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #5ae8ad, var(--accent) 60%, #22b374); color: var(--accent-ink);
+  box-shadow: 0 0 40px rgba(61, 220, 151, .35), inset 0 -6px 16px rgba(0, 0, 0, .2); transition: transform .12s, box-shadow .2s;
+}
+.ptt-mic { font-size: 36px; line-height: 1; }
+.ptt-label { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; }
+.ptt-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; pointer-events: none; }
+.ptt-btn.active .ptt-core { transform: scale(0.94); box-shadow: 0 0 70px rgba(61, 220, 151, .6), inset 0 -2px 10px rgba(0, 0, 0, .25); }
+.ptt-btn.active .ptt-ring { animation: ripple 1.4s ease-out infinite; }
+.ptt-btn.active .ptt-ring.r2 { animation-delay: .7s; }
+@keyframes ripple { from { transform: scale(1); opacity: .7; } to { transform: scale(1.6); opacity: 0; } }
+.ptt-btn:focus-visible { outline-offset: 6px; border-radius: 50%; }
+
+/* Room & Privacy */
+.peer-card { display: flex; align-items: center; gap: var(--s4); padding: var(--s4); min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); }
+.peer-meta { min-width: 0; flex: 1; }
+.pc-name { font-size: 16px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.pc-handle { font-family: var(--mono); font-size: 13px; color: var(--text-faint); margin: 2px 0 var(--s2); overflow-wrap: anywhere; }
+.pc-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.status-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 var(--s3); font-size: 12px; font-weight: 600; color: var(--text-dim); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
+.status-pill .presence-dot { animation: none; background: var(--text-faint); }
+.status-pill[data-state="online"] { color: var(--accent); border-color: var(--accent-line); }
+.status-pill[data-state="online"] .presence-dot { background: var(--accent); animation: presence 2s infinite; }
+.ping { font-family: var(--mono); font-size: 12px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.mod-bar { display: grid; grid-template-columns: 1fr; gap: var(--s3); margin-top: var(--s4); }
+@media (min-width: 560px) { .mod-bar { grid-template-columns: 1fr 1fr; } }
+.mod-bar .btn { width: 100%; }
+.btn-danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255, 107, 107, .08); }
+.btn-danger[aria-pressed="true"] { border-color: var(--danger); color: var(--danger); }
+.btn[aria-pressed="true"]:not(.btn-danger) { border-color: var(--accent-line); color: var(--accent); }
+
+/* Modals (shared) */
+.modal { position: relative; }
+.modal-close { position: absolute; top: var(--s2); right: var(--s2); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 50%; color: var(--text-dim); font-size: 24px; line-height: 1; cursor: pointer; transition: background .2s, color .2s; }
+.modal-close:hover { background: var(--surface-2); color: var(--text); }
+.modal-actions { display: flex; flex-direction: column; gap: var(--s3); margin-top: var(--s4); }
+.modal-actions.row { flex-direction: row; }
+.modal-actions .btn { flex: 1; }
+.modal-left { text-align: left; }
+.modal-left h3 { padding-right: var(--s7); margin-bottom: var(--s4); }
+.coin-big { font-size: 28px; line-height: 1; }
+.avatar-edit { display: flex; align-items: center; gap: var(--s4); margin-bottom: var(--s4); }
+.avatar-edit-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); }
+.link-btn { min-height: 44px; padding: 0 var(--s1); background: none; border: 0; color: var(--text-dim); font-size: 13px; text-decoration: underline; cursor: pointer; }
+.link-btn:hover { color: var(--danger); }
+.form-label { display: block; margin: var(--s3) 0 var(--s2); font-size: 13px; font-weight: 600; color: var(--text-dim); }
+.form-input { width: 100%; min-height: 48px; padding: 0 var(--s4); background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); color: var(--text); font-size: 16px; transition: border-color .2s, box-shadow .2s; }
+.form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61, 220, 151, .15); }
+.handle-field { display: flex; align-items: center; gap: var(--s2); color: var(--text-faint); font-family: var(--mono); }
+.modal-backdrop { overflow-y: auto; }
+#vaultModal .modal .check-ring { margin-bottom: var(--s3); }
+
+/* =====================================================
+   v3 — HEADER HARDENING, WORKSPACE CONTAINERS, SEO DRAWER
+===================================================== */
+.header-actions { flex-shrink: 0; }
+.coin-pill, .profile-capsule, .profile-btn, .presence-toggle, .coin-earn, .avatar { flex-shrink: 0; }
+.profile-text { flex-shrink: 1; }
+@media (max-width: 374px) {
+  :root { --gutter: 12px; }
+  .header-inner { gap: var(--s2); }
+  .logo { font-size: 16px; gap: 6px; }
+  .logo-mark { width: 24px; height: 24px; }
+  .header-actions { gap: 6px; }
+  .coin-pill { padding-left: var(--s2); }
+  .coin-earn { min-width: 40px; margin-left: 2px; padding: 0 var(--s2); }
+  .profile-btn, .presence-toggle { min-width: 40px; padding: 0 var(--s1); }
+}
+
+.tool-section { padding-top: 0; padding-bottom: 0; }
+.tool-card-glow { width: 100%; max-width: 780px; margin: var(--s5) auto; }
+.tool-card-glow, .tool-card { min-width: 0; overflow: hidden; }
+.ws-panel, .panel, .chat-shell, .walkie-shell, .peer-card, .peer-meta, .mod-bar, .share-row, .file-pill,
+.room-display, .progress-zone, .composer, .dropzone, .room-code-card, .chat-head, .speaker-banner, .ptt-stage { min-width: 0; }
+
+.seo-drawer { width: 100%; max-width: 780px; margin: 0 auto var(--s7); padding: 0 var(--gutter); min-width: 0; }
+.seo-accordion { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.seo-toggle { min-height: 56px; padding: var(--s3) var(--s5); font-size: 15px; }
+.seo-body { padding: 0 var(--s5) var(--s6); min-width: 0; }
+@media (min-width: 768px) { .seo-body { padding: 0 var(--s6) var(--s7); } }
+.seo-accordion .section { padding: var(--s7) 0 0; }
+.seo-accordion .section-head { margin-bottom: var(--s5); max-width: none; }
+.seo-accordion h2 { font-size: clamp(1.25rem, 4vw, 1.6rem); }
+.seo-accordion details { background: var(--bg); }
+.seo-accordion .faq-list { max-width: none; }
+.seo-accordion .features-grid { grid-template-columns: 1fr; }
+@media (min-width: 640px) { .seo-accordion .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.seo-accordion .feature-card { background: var(--bg); }
+.seo-accordion .steps { display: flex; flex-direction: column; gap: var(--s5); }
+.seo-accordion .step { flex-direction: row; gap: var(--s4); }
+.seo-accordion .step:not(:last-child)::after { left: 23px; right: auto; top: 52px; bottom: -20px; width: 2px; height: auto; }
+.seo-accordion .step-body { padding-top: var(--s2); }
+.seo-accordion .limit-box { background: var(--bg); }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#tool">Skip to transfer tool</a>
+
+<!-- ============ STICKY GLASS HEADER ============ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="/" aria-label="DropP2P home">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/>
+        <circle cx="24" cy="24" r="4.5" stroke="currentColor" stroke-width="2"/>
+        <path d="M11 11l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M21 11L11 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <span data-brand>DropP2P</span>
+    </a>
+    <span class="header-spacer" aria-hidden="true"></span>
+    <div class="header-actions">
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-ico" aria-hidden="true">🪙</span>
+        <span class="coin-text"><b id="coinCount">0</b><span class="coin-label"> Coins</span></span>
+        <button type="button" class="coin-earn" id="btnEarn" aria-label="Earn coins"><span aria-hidden="true">+</span><span class="earn-label"> Earn</span></button>
+      </div>
+      <div class="profile-capsule">
+        <button type="button" class="profile-btn" id="btnProfile" aria-label="Edit profile">
+          <span class="avatar" id="avatarMe" aria-hidden="true">G</span>
+          <span class="profile-text"><span class="p-name" id="meName">Guest</span><span class="p-handle" id="meHandle">@guest</span></span>
+        </button>
+        <button type="button" class="presence-toggle" id="btnGhost" aria-pressed="false" aria-label="Online. Tap to enable Ghost Mode (appear offline)">
+          <span class="presence-dot" id="presenceDot" aria-hidden="true"></span>
+          <span class="presence-label" id="presenceLabel">Online</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ APP TITLE BAR ============ -->
+  <div class="app-bar"><h1 class="app-title" id="page-title"><span class="dot" aria-hidden="true"></span><span><span data-brand>DropP2P</span> &mdash; Direct P2P Pipe</span></h1></div>
+
+  <!-- ============ TRANSFER TOOL ============ -->
+  <section class="tool-section" id="tool" aria-label="Transfer tool">
+    <div class="tool-card-glow">
+      <div class="tool-card">
+        <div class="ws-tabs" role="tablist" aria-label="Workspace">
+          <button type="button" class="ws-tab" role="tab" id="tabBtnFiles" data-tab="wsFiles" aria-selected="true" aria-controls="wsFiles"><span class="t-ico" aria-hidden="true">📁</span><span class="t-txt">Files</span></button>
+          <button type="button" class="ws-tab" role="tab" id="tabBtnChat" data-tab="wsChat" aria-selected="false" aria-controls="wsChat" tabindex="-1"><span class="t-ico" aria-hidden="true">💬</span><span class="t-txt">Chat &amp; Voice</span></button>
+          <button type="button" class="ws-tab" role="tab" id="tabBtnWalkie" data-tab="wsWalkie" aria-selected="false" aria-controls="wsWalkie" tabindex="-1"><span class="t-ico" aria-hidden="true">🎙️</span><span class="t-txt">Walkie-Talkie</span></button>
+          <button type="button" class="ws-tab" role="tab" id="tabBtnRoom" data-tab="wsRoom" aria-selected="false" aria-controls="wsRoom" tabindex="-1"><span class="t-ico" aria-hidden="true">⚙️</span><span class="t-txt">Room &amp; Privacy</span></button>
+        </div>
+        <section class="ws-panel active" id="wsFiles" role="tabpanel" aria-labelledby="tabBtnFiles">
+          <div class="mode-toggle sub-toggle" role="group" aria-label="Send or receive">
+          <button class="mode-btn" id="btnSendMode" aria-pressed="true">Send File</button>
+          <button class="mode-btn" id="btnRecvMode" aria-pressed="false">Receive File</button>
+        </div>
+
+        <!-- SENDER PANEL -->
+        <div class="panel active" id="panelSend">
+          <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Click or drop a file to send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+            <strong>Drop a file here or click to browse</strong>
+            <span>Any size &mdash; from documents to 50 GB+ raw footage. Your file never leaves your device until the receiver connects.</span>
+            <span class="btn-choose" aria-hidden="true">Choose File</span>
+          </div>
+          <input type="file" id="fileInput" hidden aria-label="Select file to send">
+          <div class="file-pill" id="filePill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            <div class="fp-meta"><div class="fp-name" id="fpName"></div><div class="fp-size" id="fpSize"></div></div>
+          </div>
+
+          <div class="room-display" id="roomDisplay">
+            <div class="status-line" id="senderStatus"><span class="spin" aria-hidden="true"></span>Waiting for your friend to connect&hellip;</div>
+            <div class="room-code-card">
+              <div class="code-card-label">Your room code</div>
+              <div class="room-code" id="roomCode" aria-label="Room code">------</div>
+            </div>
+            <div class="share-row">
+              <input type="text" id="shareLink" readonly aria-label="Shareable link">
+              <button class="btn btn-ghost" id="btnCopyLink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy Link
+              </button>
+            </div>
+            <div class="qr-wrap" id="qrBox" aria-label="QR code with shareable link"></div>
+            <p class="hint">Share this 6-digit code or scan the QR on the receiving device. Keep this tab open.</p>
+          </div>
+        </div>
+
+        <!-- RECEIVER PANEL -->
+        <div class="panel" id="panelRecv">
+          <label for="codeInput" class="field-label">Enter the 6-digit code you received</label>
+          <input class="code-input" id="codeInput" maxlength="6" autocomplete="off" inputmode="text" placeholder="······" aria-describedby="recvHint">
+          <p class="hint" id="recvHint">Ask the sender for their code, or open the link they shared (it fills this automatically).</p>
+          <button class="btn btn-primary btn-block" id="btnConnect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+            Connect &amp; Receive
+          </button>
+          <div class="status-line" id="recvStatus" style="margin-top:14px"></div>
+        </div>
+
+        <!-- PROGRESS (shared) -->
+        <div class="progress-zone" id="progressZone" aria-live="polite">
+          <div class="pz-file" id="pzFile"></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="pz-stats">
+            <span id="pzPercent">0%</span>
+            <span id="pzSpeed">0 MB/s</span>
+            <span id="pzEta">ETA --</span>
+          </div>
+          <div class="wake-badge" id="wakeBadge" role="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Transferring&hellip; Keep this tab open &amp; screen unlocked.
+          </div>
+        </div>
+        </section>
+
+        <!-- TAB 2: CHAT & VOICE -->
+        <section class="ws-panel" id="wsChat" role="tabpanel" aria-labelledby="tabBtnChat">
+          <div class="chat-shell">
+            <div class="chat-head">
+              <span class="avatar" data-peer-avatar aria-hidden="true">?</span>
+              <div class="chat-head-meta"><div class="ch-name" data-peer-name>No peer connected</div><div class="ch-sub" data-peer-status>Connect from the Files tab to chat</div></div>
+            </div>
+            <div class="chat-viewport" id="chatViewport" role="log" aria-live="polite" tabindex="0" aria-label="Chat messages">
+              <div class="chat-empty" id="chatEmpty"><span aria-hidden="true">💬</span><p>No messages yet. Say hi once a peer is connected.</p></div>
+            </div>
+            <div class="composer-wrap">
+              <div class="rec-indicator" id="recIndicator" hidden>
+                <span class="rec-dot" aria-hidden="true"></span>
+                <span class="wave-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                <span class="rec-time" id="recTime">0:00</span>
+                <span class="rec-hint">Tap mic to stop &amp; send</span>
+              </div>
+              <div class="composer" id="chatComposer">
+                <input type="text" id="chatInput" class="composer-input" placeholder="Type a message…" autocomplete="off" aria-label="Message">
+                <button type="button" class="icon-btn" id="btnVoiceNote" aria-label="Record voice note" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4"/></svg>
+                </button>
+                <button type="button" class="icon-btn icon-btn-primary" id="btnChatSend" aria-label="Send message">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+              </div>
+              <div class="lock-overlay" id="chatLock">
+                <div class="lock-card">
+                  <div class="lock-ico" aria-hidden="true">🔒</div>
+                  <h3>Unlock Chat for 3h</h3>
+                  <p>Use 1 Coin or watch a short ad.</p>
+                  <div class="lock-actions">
+                    <button type="button" class="btn btn-primary" id="btnChatCoin">Use 1 Coin</button>
+                    <button type="button" class="btn btn-ghost" id="btnChatAd">Watch Ad</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3: WALKIE-TALKIE -->
+        <section class="ws-panel" id="wsWalkie" role="tabpanel" aria-labelledby="tabBtnWalkie">
+          <div class="walkie-shell">
+            <div class="speaker-banner" id="speakerBanner" role="status" aria-live="polite"><span class="live-dot" aria-hidden="true"></span><span id="speakerText">Channel idle</span></div>
+            <canvas id="waveCanvas" class="wave-canvas" height="96" aria-hidden="true"></canvas>
+            <div class="ptt-stage">
+              <button type="button" class="ptt-btn" id="btnPTT" aria-pressed="false" aria-label="Hold to talk">
+                <span class="ptt-ring r1" aria-hidden="true"></span><span class="ptt-ring r2" aria-hidden="true"></span>
+                <span class="ptt-core"><span class="ptt-mic" aria-hidden="true">🎙️</span><span class="ptt-label">HOLD TO TALK</span></span>
+              </button>
+            </div>
+            <p class="hint" id="pttHint">Press and hold to transmit. Release to stop.</p>
+            <div class="lock-overlay" id="walkieLock">
+              <div class="lock-card">
+                <div class="lock-ico" aria-hidden="true">🔒</div>
+                <h3>Speaker pass expired</h3>
+                <p>Unlock the mic for 3h with 1 Coin or a 60s ad.</p>
+                <div class="lock-actions">
+                  <button type="button" class="btn btn-primary" id="btnWalkieCoin">Use 1 Coin</button>
+                  <button type="button" class="btn btn-ghost" id="btnWalkieAd">Watch 60s Ad</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: ROOM & PRIVACY -->
+        <section class="ws-panel" id="wsRoom" role="tabpanel" aria-labelledby="tabBtnRoom">
+          <div class="peer-card">
+            <span class="avatar lg" data-peer-avatar aria-hidden="true">?</span>
+            <div class="peer-meta">
+              <div class="pc-name" data-peer-name id="peerName">No peer connected</div>
+              <div class="pc-handle" id="peerHandle">—</div>
+              <div class="pc-status"><span class="status-pill" id="peerStatusPill" data-state="idle"><span class="presence-dot" aria-hidden="true"></span><span data-peer-status id="peerStatus">Not connected</span></span><span class="ping" id="peerPing">— ms</span></div>
+            </div>
+          </div>
+          <div class="mod-bar" role="group" aria-label="Moderation">
+            <button type="button" class="btn btn-ghost" id="btnMutePeer" aria-pressed="false"><span class="mod-ico" aria-hidden="true">🔔</span><span class="mod-txt">Mute</span></button>
+            <button type="button" class="btn btn-ghost btn-danger" id="btnBlockPeer" aria-pressed="false"><span class="mod-ico" aria-hidden="true">🚫</span><span class="mod-txt">Block Peer</span></button>
+          </div>
+          <p class="hint">Mute silences alerts and audio on this device only. Blocking ends the session and remembers the peer on this device.</p>
+        </section>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SEO DRAWER (collapsed by default, fully crawlable) ============ -->
+  <section class="seo-drawer" aria-label="About DropP2P">
+    <details class="seo-accordion">
+      <summary class="seo-toggle">📖 About DropP2P, Features &amp; FAQ Guide<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="seo-body">
+
+        <section class="section" id="features" aria-labelledby="features-title">
+          <div class="section-head">
+            <p class="kicker">Why DropP2P</p>
+            <h2 id="features-title">A transfer pipe with chat and voice built in</h2>
+            <p class="section-sub">Most file services upload your data to a server, hold it, and hope you pay before it expires. DropP2P skips the warehouse &mdash; your files, messages and voice flow straight from one device to the other.</p>
+          </div>
+          <div class="features-grid">
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg></div>
+          <h3>Unlimited P2P File Transfer</h3>
+          <p>Send files of any size directly from browser to browser. 10 GB of RAW photos or 50 GB of 4K footage &mdash; the ceiling is your own disk, not a subscription tier, because there is no upload destination.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4"/></svg></div>
+          <h3>Push-to-Talk Walkie-Talkie</h3>
+          <p>Hold one button to talk live to your connected peer, with a live speaker indicator and audio waveform. Unlock the mic for 3 hours with 1 DropCoin or a short ad.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg></div>
+          <h3>Real-time Chat with Voice Notes</h3>
+          <p>Message your peer in real time and record voice notes, right next to your transfer. Chat and voice travel directly between the two connected browsers.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+          <h3>User Profiles &amp; Presence</h3>
+          <p>Pick a display name, @handle and avatar that stay on your device. Use Ghost Mode to appear offline, and mute or block a peer at any time.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h13M3 12h9M3 17h13"/><path d="M19 9l3 3-3 3"/></svg></div>
+          <h3>Zero Cloud Storage</h3>
+          <p>Files stream over WebRTC data channels. No copy of your data is written to any server, so there is nothing to breach, expire, or mine for training data.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></div>
+          <h3>End-to-End Encryption</h3>
+          <p>Every WebRTC data channel is mandatorily encrypted with DTLS. The encryption is enforced by the browser itself &mdash; neither DropP2P nor anyone in between can read the stream.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+          <h3>Chunk Streaming Engine</h3>
+          <p>Files are sliced into 64 KB chunks and streamed with <code>bufferedAmount</code> backpressure, so a 50 GB transfer runs smoothly even on a low-RAM phone without loading the file into memory.</p>
+        </article>
+        <article class="feature-card">
+          <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M8 19h4"/><rect x="18" y="8" width="4" height="11" rx="1"/></svg></div>
+          <h3>Cross-Device Compatibility</h3>
+          <p>Phone to PC, PC to tablet, Android to iPhone &mdash; if it runs a modern browser, it can send or receive. No app install, no account, no cable.</p>
+        </article>
+          </div>
+        </section>
+
+        <section class="section" id="how-it-works" aria-labelledby="how-title">
+          <div class="section-head">
+            <p class="kicker">How it works</p>
+            <h2 id="how-title">From your device to theirs, in five stages</h2>
+          </div>
+          <ol class="steps" style="list-style:none">
+        <li class="step"><div class="step-num">1</div><div class="step-body"><h3>Set up your profile</h3><p>Optionally choose a display name, @handle and avatar. They are stored only on your device.</p></div></li>
+        <li class="step"><div class="step-num">2</div><div class="step-body"><h3>Send or receive</h3><p>Drop any file on the Files tab, then share the 6-digit room code, QR code, or one-click link. The receiver just enters the code.</p></div></li>
+        <li class="step"><div class="step-num">3</div><div class="step-body"><h3>Real-time P2P handshake</h3><p>STUN punches through NAT; a TURN relay steps in only when firewalls are strict. A direct encrypted channel opens.</p></div></li>
+        <li class="step"><div class="step-num">4</div><div class="step-body"><h3>Transfer, chat or talk</h3><p>Files stream as 64 KB chunks with live speed and ETA. While connected you can also use Chat with voice notes or the Push-to-Talk Walkie-Talkie.</p></div></li>
+        <li class="step"><div class="step-num">5</div><div class="step-body"><h3>Secure download</h3><p>After a brief finalization screen, the file is reassembled locally and saved &mdash; the channel then closes for good.</p></div></li>
+          </ol>
+        </section>
+
+        <section class="section" id="limitations" aria-labelledby="limit-title">
+          <div class="limit-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+            <div style="min-width:0">
+              <h3 id="limit-title">One honest limitation you should know</h3>
+              <p>Because DropP2P streams files directly between devices with <strong>no intermediate server storage</strong>, both the sender and the receiver must remain online with this page open at the same time, for the entire duration of the transfer. If either side disconnects mid-transfer, the transfer must be restarted. This is the trade-off for unlimited size, zero storage, and full privacy &mdash; and for most direct handoffs, it is exactly what you want.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="faq" aria-labelledby="faq-title">
+          <div class="section-head">
+            <p class="kicker">FAQ</p>
+            <h2 id="faq-title">Frequently asked questions</h2>
+          </div>
+          <div class="faq-list">
+        <details><summary>Does DropP2P store my files on a server?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No. DropP2P has no cloud storage at all. Your file is streamed directly from your device to the other person's device over an encrypted WebRTC connection, so no copy ever exists on our infrastructure.</div></details>
+        <details><summary>Can I send files between different cities or networks?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. DropP2P uses Google's public STUN servers plus free TURN relay fallback, so connections succeed across different Wi-Fi networks, 4G and 5G, even behind strict NATs and firewalls.</div></details>
+        <details><summary>Is there a file size limit?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No. Files are sliced into 64 KB chunks and streamed sequentially with memory-safe backpressure, so transfers of 10 GB, 50 GB or more work as long as both devices have enough free disk space for the final download.</div></details>
+        <details><summary>Do both people need to be online at the same time?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. Because files are streamed directly between devices with no intermediate server storage, the sender and receiver must both keep the page open for the duration of the transfer.</div></details>
+        <details><summary>Does DropP2P work on phones?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. It works in modern mobile browsers. When a transfer starts, the Screen Wake Lock API keeps the screen awake, but you should still keep the tab in the foreground for the best speeds.</div></details>
+        <details><summary>What happens if I lock my phone screen mid-transfer?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">The Wake Lock keeps the screen on while the tab is visible, but some aggressive phone manufacturers may still pause network activity in the background. Keep the screen unlocked and the tab open until the transfer finishes.</div></details>
+        <details><summary>Is the transfer encrypted?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. All WebRTC data channels are encrypted with DTLS (Datagram Transport Layer Security) by default, so the data is encrypted in transit between the two devices.</div></details>
+        <details><summary>Do I need to create an account?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">No registration, no email, no sign-up. Generate a 6-digit code, share it, and start transferring immediately.</div></details>
+        <details><summary>Which browsers are supported?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Any modern browser with WebRTC support: Chrome, Edge, Firefox, Safari, Opera, and their mobile versions.</div></details>
+        <details><summary>Can I chat or talk to the person I am connected to?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="faq-a">Yes. Besides unlimited P2P file transfer, the workspace includes real-time chat with voice notes and a Push-to-Talk Walkie-Talkie. You can set a display name, @handle and avatar (stored only on your device), mute or block a peer, and use Ghost Mode to appear offline. Chat and Walkie-Talkie unlock for 3 hours with 1 DropCoin or a short ad.</div></details>
+          </div>
+        </section>
+
+      </div>
+    </details>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p>&copy; <span id="year"></span> <span data-brand>DropP2P</span> &mdash; Transfer Huge Files Directly Between Devices. 100% Free &amp; Private.</p>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#faq">FAQ</a>
+      <a href="mailto:Hello.devdesk@gmail.com">Contact: Hello.devdesk@gmail.com</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ============ 20s REWARDED AD-GATE MODAL ============ -->
+<div class="modal-backdrop" id="gateBackdrop" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="modal" id="adGateModal">
+    <div class="check-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h3 id="gateTitle">File transfer complete!</h3>
+    <p class="modal-sub">Finalizing secure download in <span id="gateSecondsLabel" aria-live="assertive">20</span>&hellip;</p>
+    <div class="countdown" id="gateCountdown">20</div>
+    <div class="ad-box" aria-label="Advertisement"><span class="ad-label">Advertisement</span><span class="ad-hint">Rewarded ad slot</span></div>
+    <div class="progress-track mini"><div class="progress-fill" id="gateProgress" style="width:0%"></div></div>
+    <p class="paused-note" id="gatePaused" style="display:none">Timer paused &mdash; return to this tab to continue.</p>
+  </div>
+</div>
+
+<!-- ============ VAULT MODAL ============ -->
+<div class="modal-backdrop" id="vaultModal" role="dialog" aria-modal="true" aria-labelledby="vaultTitle">
+  <div class="modal">
+    <button type="button" class="modal-close" data-close="vaultModal" aria-label="Close">&times;</button>
+    <div class="check-ring"><span class="coin-big" aria-hidden="true">🪙</span></div>
+    <h3 id="vaultTitle">Coin Vault</h3>
+    <p class="modal-sub" id="vaultDesc">Watch a 90s ad to earn +1 DropCoin.</p>
+    <div class="countdown" id="vaultCountdown">90</div>
+    <div class="ad-box" aria-label="Advertisement"><span class="ad-label">Advertisement</span><span class="ad-hint">Rewarded ad slot</span></div>
+    <div class="progress-track mini"><div class="progress-fill" id="vaultProgress" style="width:0%"></div></div>
+    <p class="paused-note" id="vaultPaused" hidden>Timer paused &mdash; return to this tab to continue.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-primary" id="btnVaultStart">Start ad</button>
+      <button type="button" class="btn btn-primary" id="btnVaultClaim" disabled hidden>Claim +1 DropCoin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONSENT MODAL ============ -->
+<div class="modal-backdrop" id="consentModal" role="alertdialog" aria-modal="true" aria-labelledby="consentTitle" aria-describedby="consentText">
+  <div class="modal">
+    <div class="check-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+    <h3 id="consentTitle">Incoming file request</h3>
+    <p class="modal-sub" id="consentText"><strong id="consentHandle">@peer</strong> wants to send <strong id="consentFile">file</strong> (<span id="consentSize">0 B</span>)</p>
+    <div class="modal-actions row">
+      <button type="button" class="btn btn-ghost" id="btnConsentDecline">Decline</button>
+      <button type="button" class="btn btn-primary" id="btnConsentAccept">Accept</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROFILE MODAL ============ -->
+<div class="modal-backdrop" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <div class="modal modal-left">
+    <button type="button" class="modal-close" data-close="profileModal" aria-label="Close">&times;</button>
+    <h3 id="profileTitle">Edit profile</h3>
+    <div class="avatar-edit">
+      <span class="avatar lg" id="avatarPreview" aria-hidden="true">G</span>
+      <div class="avatar-edit-actions">
+        <button type="button" class="btn btn-ghost" id="btnAvatarPick">Upload photo</button>
+        <button type="button" class="link-btn" id="btnAvatarClear">Remove</button>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" hidden aria-label="Avatar image">
+    </div>
+    <label class="form-label" for="profileName">Display name</label>
+    <input class="form-input" id="profileName" maxlength="24" autocomplete="off">
+    <label class="form-label" for="profileHandle">Handle</label>
+    <div class="handle-field"><span aria-hidden="true">@</span><input class="form-input" id="profileHandle" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="modal-actions row">
+      <button type="button" class="btn btn-ghost" data-close="profileModal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="btnProfileSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Libraries -->
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<script>
+/* =====================================================
+   DropP2P — Single-file P2P transfer engine
+   (JS logic preserved exactly — no changes)
+===================================================== */
+const SITE_CONFIG = {
+  name: 'DropP2P',
+  url: 'https://dropp2p.pages.dev/',
+  email: 'Hello.devdesk@gmail.com',
+  adTimerSeconds: 20
+};
+
+/* ---------- STUN + TURN (cross-city / firewall fallback) ---------- */
+const PEER_CONFIG = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'turn:openrelay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
+{ urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+    ],
+    iceCandidatePoolSize: 4
+  }
+};
+
+const CHUNK_SIZE   = 64 * 1024;        // 64 KB slices (RAM-safe)
+const HIGH_WATER   = 4 * 1024 * 1024;  // backpressure threshold
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+/* ---------- DOM refs ---------- */
+const $ = id => document.getElementById(id);
+const els = {
+  btnSendMode: $('btnSendMode'), btnRecvMode: $('btnRecvMode'),
+  panelSend: $('panelSend'), panelRecv: $('panelRecv'),
+  dropzone: $('dropzone'), fileInput: $('fileInput'),
+  filePill: $('filePill'), fpName: $('fpName'), fpSize: $('fpSize'),
+  roomDisplay: $('roomDisplay'), roomCode: $('roomCode'),
+  shareLink: $('shareLink'), btnCopyLink: $('btnCopyLink'), qrBox: $('qrBox'),
+  senderStatus: $('senderStatus'),
+  codeInput: $('codeInput'), btnConnect: $('btnConnect'), recvStatus: $('recvStatus'),
+  progressZone: $('progressZone'), pzFile: $('pzFile'), progressFill: $('progressFill'),
+  pzPercent: $('pzPercent'), pzSpeed: $('pzSpeed'), pzEta: $('pzEta'),
+  wakeBadge: $('wakeBadge'),
+  gateBackdrop: $('gateBackdrop'), gateCountdown: $('gateCountdown'),
+  gateSecondsLabel: $('gateSecondsLabel'), gateProgress: $('gateProgress'), gatePaused: $('gatePaused'),
+  toast: $('toast')
+};
+
+/* ---------- State ---------- */
+let senderPeer = null, receiverPeer = null, activeConn = null;
+let sendFile = null, sending = false;
+let recvMeta = null, recvChunks = [], recvBytes = 0, recvDone = false;
+let lastTick = 0, lastBytes = 0;
+let wakeLock = null, transferActive = false;
+let gateTimer = null, gateRemaining = SITE_CONFIG.adTimerSeconds;
+
+/* ---------- Utilities ---------- */
+function toast(msg) {
+  els.toast.textContent = msg;
+  els.toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => els.toast.classList.remove('show'), 2600);
+}
+function fmtSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+  return (b / 1073741824).toFixed(2) + ' GB';
+}
+function genCode() {
+  let c = '';
+  for (let i = 0; i < 6; i++) c += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
+  return c;
+}
+
+/* ---------- Mode toggle ---------- */
+function setMode(mode) {
+  const send = mode === 'send';
+  els.btnSendMode.setAttribute('aria-pressed', send);
+  els.btnRecvMode.setAttribute('aria-pressed', !send);
+  els.panelSend.classList.toggle('active', send);
+  els.panelRecv.classList.toggle('active', !send);
+}
+els.btnSendMode.addEventListener('click', () => setMode('send'));
+els.btnRecvMode.addEventListener('click', () => setMode('recv'));
+
+/* ---------- Wake Lock (mobile sleep protection) ---------- */
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    els.wakeBadge.classList.add('show');
+    wakeLock.addEventListener('release', () => { els.wakeBadge.classList.remove('show'); });
+  } catch (e) { /* Wake Lock unavailable — badge hidden */ }
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  els.wakeBadge.classList.remove('show');
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && transferActive) requestWakeLock();
+});
+
+/* ---------- Progress rendering (shared) ---------- */
+function renderProgress(bytes, total) {
+  const pct = total ? Math.min(100, (bytes / total) * 100) : 0;
+  els.progressFill.style.width = pct.toFixed(2) + '%';
+  els.pzPercent.textContent = pct.toFixed(1) + '%';
+
+  const now = performance.now();
+  if (lastTick && now - lastTick > 400) {
+    const speed = (bytes - lastBytes) / ((now - lastTick) / 1000); // B/s
+    els.pzSpeed.textContent = fmtSize(speed) + '/s';
+    if (speed > 0 && bytes < total) {
+      const eta = (total - bytes) / speed;
+      els.pzEta.textContent = 'ETA ' + (eta >= 3600
+        ? Math.floor(eta / 3600) + 'h ' + Math.floor((eta % 3600) / 60) + 'm'
+        : Math.floor(eta / 60) + 'm ' + Math.floor(eta % 60) + 's');
+    } else if (bytes >= total) {
+      els.pzEta.textContent = 'ETA 0s';
+    }
+    lastTick = now;
+    lastBytes = bytes;
+  }
+}
+
+function showProgress(name, total) {
+  lastTick = 0; lastBytes = 0;
+  els.pzFile.textContent = name + ' — ' + fmtSize(total);
+  els.progressZone.classList.add('show');
+  renderProgress(0, total);
+}
+
+/* =====================================================
+   SENDER FLOW
+===================================================== */
+els.dropzone.addEventListener('click', () => { if (!sending) els.fileInput.click(); });
+els.dropzone.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && !sending) { e.preventDefault(); els.fileInput.click(); }
+});
+['dragover', 'dragenter'].forEach(ev => els.dropzone.addEventListener(ev, e => {
+  e.preventDefault(); els.dropzone.classList.add('dragover');
+}));
+['dragleave', 'drop'].forEach(ev => els.dropzone.addEventListener(ev, e => {
+  e.preventDefault(); els.dropzone.classList.remove('dragover');
+}));
+els.dropzone.addEventListener('drop', e => {
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) initSender(f);
+});
+els.fileInput.addEventListener('change', () => {
+  const f = els.fileInput.files && els.fileInput.files[0];
+  if (f) initSender(f);
+});
+
+function initSender(file) {
+  if (senderPeer) { senderPeer.destroy(); senderPeer = null; }
+  sendFile = file;
+  els.fpName.textContent = file.name;
+  els.fpSize.textContent = fmtSize(file.size);
+  els.filePill.classList.add('show');
+  els.roomDisplay.classList.remove('show');
+  els.progressZone.classList.remove('show');
+
+  const code = genCode();
+  els.roomCode.textContent = code;
+  const link = SITE_CONFIG.url + (SITE_CONFIG.url.endsWith('/') ? '' : '/') + '?room=' + code;
+  els.shareLink.value = link;
+  els.qrBox.innerHTML = '';
+  new QRCode(els.qrBox, {
+    text: link,
+    width: 148, height: 148,
+    colorDark: '#0a0b0d', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  els.roomDisplay.classList.add('show');
+  els.senderStatus.innerHTML = '<span class="spin" aria-hidden="true"></span>Waiting for your friend to connect…';
+
+  const peer = new Peer('dropp2p-' + code, PEER_CONFIG);
+  senderPeer = peer;
+
+  peer.on('open', () => {
+    els.senderStatus.innerHTML = 'Room ready — waiting for your friend to open the link or enter <strong style="color:var(--accent);font-family:var(--mono)">' + code + '</strong>';
+  });
+
+  peer.on('connection', conn => {
+    if (activeConn) { conn.close(); return; }
+    activeConn = conn;
+    conn.on('open', () => startSending(conn));
+    conn.on('error', () => toast('Connection error — transfer interrupted.'));
+    conn.on('close', () => {
+      if (sending) { sending = false; transferActive = false; releaseWakeLock(); toast('Receiver disconnected. Transfer stopped.'); }
+    });
+  });
+
+  peer.on('error', err => {
+    if (err.type === 'unavailable-id') {
+      // Code collision — regenerate and retry
+      initSender(file);
+    } else if (err.type === 'network' || err.type === 'server-error') {
+      els.senderStatus.textContent = 'Network error reaching the signaling server. Check your connection and try again.';
+    }
+  });
+}
+
+els.btnCopyLink.addEventListener('click', () => {
+  const link = els.shareLink.value;
+  if (!link) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => toast('Link copied to clipboard'));
+  } else {
+    els.shareLink.select();
+    document.execCommand('copy');
+    toast('Link copied to clipboard');
+  }
+});
+
+function startSending(conn) {
+  transferActive = true;
+  sending = true;
+  requestWakeLock();
+  showProgress(sendFile.name, sendFile.size);
+  els.senderStatus.textContent = 'Connected! Streaming directly to your friend…';
+  toast('Receiver connected — transfer started');
+
+  // 1) Send metadata header
+  conn.send({ t: 'meta', name: sendFile.name, size: sendFile.size, mime: sendFile.type || 'application/octet-stream' });
+
+  // 2) Stream 64 KB chunks with bufferedAmount backpressure
+  let offset = 0;
+  function pump() {
+    if (!sending) return;
+    if (offset >= sendFile.size) {
+      conn.send({ t: 'done' });
+      sending = false;
+      transferActive = false;
+      releaseWakeLock();
+      els.pzPercent.textContent = '100%';
+      els.pzSpeed.textContent = '—';
+      els.pzEta.textContent = 'Done';
+      els.progressFill.style.width = '100%';
+      els.senderStatus.innerHTML = '<strong style="color:var(--accent)">File delivered!</strong> You can close this tab or send another file.';
+      toast('Transfer complete — file delivered');
+      return;
+    }
+    if (conn.dataChannel && conn.dataChannel.bufferedAmount > HIGH_WATER) {
+      setTimeout(pump, 30); // backpressure: wait for the receiver to drain
+      return;
+    }
+    sendFile.slice(offset, offset + CHUNK_SIZE).arrayBuffer().then(buf => {
+      if (!sending) return;
+      conn.send(buf);
+      offset += CHUNK_SIZE;
+      renderProgress(offset, sendFile.size);
+      pump();
+    }).catch(() => {
+      sending = false;
+      toast('Failed to read file chunk — transfer stopped.');
+    });
+  }
+  pump();
+}
+
+/* =====================================================
+   RECEIVER FLOW
+===================================================== */
+els.codeInput.addEventListener('input', () => {
+  els.codeInput.value = els.codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+});
+els.codeInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') els.btnConnect.click();
+});
+
+els.btnConnect.addEventListener('click', () => {
+  const code = els.codeInput.value.trim();
+  if (code.length !== 6) { toast('Enter the full 6-digit code'); els.codeInput.focus(); return; }
+  connectAsReceiver(code.toUpperCase());
+});
+
+function connectAsReceiver(code) {
+  if (receiverPeer) { receiverPeer.destroy(); receiverPeer = null; }
+  els.btnConnect.disabled = true;
+  els.recvStatus.innerHTML = '<span class="spin" aria-hidden="true"></span>Connecting to sender…';
+  els.progressZone.classList.remove('show');
+  recvMeta = null; recvChunks = []; recvBytes = 0; recvDone = false;
+
+  const peer = new Peer(PEER_CONFIG);
+  receiverPeer = peer;
+
+  peer.on('open', myId => {
+    const conn = peer.connect('dropp2p-' + code, { reliable: true });
+    activeConn = conn;
+
+    conn.on('open', () => {
+      els.recvStatus.textContent = 'Connected! Waiting for the file to stream…';
+    });
+
+    conn.on('data', data => {
+      // Metadata header
+      if (data && data.t === 'meta') {
+        recvMeta = data;
+        recvChunks = [];
+        recvBytes = 0;
+        transferActive = true;
+        requestWakeLock();
+        showProgress(data.name, data.size);
+        els.recvStatus.textContent = 'Receiving ' + data.name + '…';
+        return;
+      }
+      // Completion signal
+      if (data && data.t === 'done') {
+        recvDone = true;
+        transferActive = false;
+        releaseWakeLock();
+        els.recvStatus.textContent = 'Download ready.';
+        openAdGate();
+        return;
+      }
+      // Binary chunk
+      if (recvMeta && recvChunks && !recvDone) {
+        recvChunks.push(data);
+        recvBytes += data.byteLength || data.size || 0;
+        renderProgress(recvBytes, recvMeta.size);
+      }
+    });
+
+    conn.on('close', () => {
+      if (!recvDone) {
+        transferActive = false; releaseWakeLock();
+        els.btnConnect.disabled = false;
+        els.recvStatus.textContent = 'Connection closed before the transfer finished. Ask the sender to restart.';
+      }
+    });
+    conn.on('error', () => {
+      els.recvStatus.textContent = 'Connection error. Check the code and try again.';
+      els.btnConnect.disabled = false;
+    });
+  });
+
+  peer.on('error', err => {
+    if (err.type === 'peer-unavailable') {
+      els.recvStatus.textContent = 'No sender found with that code. Double-check it — the sender must keep their tab open.';
+      els.btnConnect.disabled = false;
+    } else if (err.type === 'network' || err.type === 'server-error') {
+      els.recvStatus.textContent = 'Network error reaching the signaling server. Try again in a moment.';
+      els.btnConnect.disabled = false;
+    } else {
+      els.recvStatus.textContent = 'Error: ' + err.type + '. Please try again.';
+      els.btnConnect.disabled = false;
+    }
+  });
+}
+
+/* =====================================================
+   20-SECOND REWARDED AD GATE (visibility-aware)
+===================================================== */
+function openAdGate() {
+  gateRemaining = SITE_CONFIG.adTimerSeconds;
+  els.gateCountdown.textContent = gateRemaining;
+  els.gateSecondsLabel.textContent = gateRemaining;
+  els.gateProgress.style.width = '0%';
+  els.gateBackdrop.classList.add('show');
+
+  clearInterval(gateTimer);
+  gateTimer = setInterval(() => {
+    // Pause when the tab is hidden
+    if (document.hidden) {
+      els.gatePaused.style.display = 'block';
+      return;
+    }
+    els.gatePaused.style.display = 'none';
+    gateRemaining--;
+    els.gateCountdown.textContent = Math.max(0, gateRemaining);
+    els.gateSecondsLabel.textContent = Math.max(0, gateRemaining);
+    const elapsed = SITE_CONFIG.adTimerSeconds - gateRemaining;
+    els.gateProgress.style.width = ((elapsed / SITE_CONFIG.adTimerSeconds) * 100).toFixed(1) + '%';
+
+    if (gateRemaining <= 0) {
+      clearInterval(gateTimer);
+      finalizeDownload();
+    }
+  }, 1000);
+}
+
+function finalizeDownload() {
+  els.gateBackdrop.classList.remove('show');
+  if (!recvMeta || !recvChunks.length) {
+    toast('Something went wrong assembling the file.');
+    return;
+  }
+  const blob = new Blob(recvChunks, { type: recvMeta.mime });
+  recvChunks = []; // free chunk references — Blob now owns the data
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = recvMeta.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  els.recvStatus.innerHTML = '<strong style="color:var(--accent)">Downloaded!</strong> ' + recvMeta.name + ' (' + fmtSize(blob.size) + ') saved.';
+  els.btnConnect.disabled = false;
+
+  // Celebration
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 160, spread: 90, origin: { y: 0.65 }, zIndex: 500 });
+    setTimeout(() => confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 }, zIndex: 500 }), 350);
+  }
+  toast('Download complete — enjoy!');
+}
+
+/* =====================================================
+   BOOT
+===================================================== */
+(function boot() {
+  // Brand name from config
+  document.querySelectorAll('[data-brand]').forEach(el => el.textContent = SITE_CONFIG.name);
+  $('year').textContent = new Date().getFullYear();
+
+  // Deep-link support: ?room=XXXXXX auto-fills and switches to Receive mode
+  try {
+    const params = new URLSearchParams(location.search);
+    const room = (params.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (room.length === 6) {
+      setMode('recv');
+      els.codeInput.value = room;
+      toast('Room code detected — tap Connect & Receive');
+    }
+  } catch (e) { /* URL parsing unavailable */ }
+})();
+</script>
+<script id="workspace-ui">
+/* Workspace UI shell — additive. Does not touch the transfer logic above.
+   Integration hooks:
+   - window.DropUI.{addMessage,setCoins,getCoins,setPeer,setSpeaking,requestConsent}
+   - CustomEvents on document: dropp2p:chat-send, dropp2p:voice-note, dropp2p:ptt, dropp2p:mute, dropp2p:block, dropp2p:presence */
+(function () {
+  'use strict';
+  const q = id => document.getElementById(id);
+  const say = m => { try { if (typeof toast === 'function') toast(m); } catch (e) {} };
+  const emit = (n, d) => document.dispatchEvent(new CustomEvent('dropp2p:' + n, { detail: d }));
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  const initials = n => (n || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || '?';
+  const HOURS3 = 3 * 3600 * 1000;
+
+  /* ---------- Modals ---------- */
+  let lastFocus = null;
+  function openModal(id) { const m = q(id); lastFocus = document.activeElement; m.classList.add('show'); const f = m.querySelector('input:not([hidden]),button:not([disabled])'); if (f) setTimeout(() => f.focus(), 30); }
+  function closeModal(id) { q(id).classList.remove('show'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  document.addEventListener('click', e => { const c = e.target.closest('[data-close]'); if (c) { closeModal(c.dataset.close); if (c.dataset.close === 'vaultModal') vaultReset(); } });
+  ['vaultModal', 'profileModal'].forEach(id => q(id).addEventListener('click', e => { if (e.target === q(id)) { closeModal(id); if (id === 'vaultModal') vaultReset(); } }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { ['vaultModal', 'profileModal'].forEach(id => { if (q(id).classList.contains('show')) { closeModal(id); if (id === 'vaultModal') vaultReset(); } }); } });
+
+  /* ---------- Profile & presence ---------- */
+  let profile = store.get('dropp2p_profile', null);
+  if (!profile) { profile = { name: 'Guest', handle: 'guest' + Math.floor(1000 + Math.random() * 9000), avatar: '' }; store.set('dropp2p_profile', profile); }
+  function paintAvatar(el, p) { el.textContent = p.avatar ? '' : initials(p.name); el.style.backgroundImage = p.avatar ? 'url(' + p.avatar + ')' : ''; }
+  function renderProfile() { q('meName').textContent = profile.name; q('meHandle').textContent = '@' + profile.handle; paintAvatar(q('avatarMe'), profile); }
+  renderProfile();
+  let draft = null;
+  q('btnProfile').addEventListener('click', () => { draft = Object.assign({}, profile); q('profileName').value = draft.name; q('profileHandle').value = draft.handle; paintAvatar(q('avatarPreview'), draft); openModal('profileModal'); });
+  q('btnAvatarPick').addEventListener('click', () => q('avatarInput').click());
+  q('btnAvatarClear').addEventListener('click', () => { draft.avatar = ''; paintAvatar(q('avatarPreview'), { name: q('profileName').value, avatar: '' }); });
+  q('profileName').addEventListener('input', () => { if (!draft.avatar) paintAvatar(q('avatarPreview'), { name: q('profileName').value, avatar: '' }); });
+  q('avatarInput').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const img = new Image(), url = URL.createObjectURL(f);
+    img.onload = () => { const c = document.createElement('canvas'), s = 128; c.width = c.height = s; const x = c.getContext('2d'), m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, s, s); draft.avatar = c.toDataURL('image/jpeg', 0.8); paintAvatar(q('avatarPreview'), draft); URL.revokeObjectURL(url); };
+    img.onerror = () => { URL.revokeObjectURL(url); say('Could not read that image'); };
+    img.src = url; e.target.value = '';
+  });
+  q('btnProfileSave').addEventListener('click', () => {
+    const name = q('profileName').value.trim().slice(0, 24) || 'Guest';
+    const handle = q('profileHandle').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+    if (!handle) { say('Handle needs letters or numbers'); q('profileHandle').focus(); return; }
+    profile = { name, handle, avatar: draft.avatar }; store.set('dropp2p_profile', profile); renderProfile(); closeModal('profileModal'); say('Profile saved');
+  });
+  let ghost = store.get('dropp2p_ghost', false);
+  function renderGhost() {
+    q('btnGhost').setAttribute('aria-pressed', ghost);
+    q('presenceLabel').textContent = ghost ? '👻 Ghost' : 'Online';
+    q('btnGhost').setAttribute('aria-label', ghost ? 'Ghost Mode on, appearing offline. Tap to go online' : 'Online. Tap to enable Ghost Mode (appear offline)');
+  }
+  renderGhost();
+  q('btnGhost').addEventListener('click', () => { ghost = !ghost; store.set('dropp2p_ghost', ghost); renderGhost(); emit('presence', { ghost }); say(ghost ? '👻 Ghost Mode on — you appear offline' : 'You appear online'); });
+
+  /* ---------- Coins, locks & the ad timer ---------- */
+  let coins = store.get('dropp2p_coins', 0);
+  function setCoins(n) { coins = Math.max(0, n | 0); store.set('dropp2p_coins', coins); q('coinCount').textContent = coins; }
+  setCoins(coins);
+  const until = k => store.get('dropp2p_' + k + '_until', 0);
+  function renderLocks() { q('chatLock').classList.toggle('show', Date.now() > until('chat')); q('walkieLock').classList.toggle('show', Date.now() > until('ptt')); }
+  renderLocks(); setInterval(renderLocks, 15000);
+  function unlock(k) { store.set('dropp2p_' + k + '_until', Date.now() + HOURS3); renderLocks(); say('Unlocked for 3 hours'); }
+  function spend(k) { if (coins < 1) { say('Not enough coins — earn one first'); openVault('earn'); return; } setCoins(coins - 1); unlock(k); }
+  q('btnChatCoin').addEventListener('click', () => spend('chat'));
+  q('btnWalkieCoin').addEventListener('click', () => spend('ptt'));
+  q('btnChatAd').addEventListener('click', () => openVault('chat'));
+  q('btnWalkieAd').addEventListener('click', () => openVault('ptt'));
+  q('btnEarn').addEventListener('click', () => openVault('earn'));
+
+  const MODES = {
+    earn: { secs: 90, title: 'Coin Vault', desc: 'Watch a 90s ad to earn +1 DropCoin.', claim: 'Claim +1 DropCoin' },
+    chat: { secs: 20, title: 'Unlock Chat for 3h', desc: 'Watch a short ad to unlock chat.', claim: 'Unlock Chat' },
+    ptt: { secs: 60, title: 'Unlock Walkie-Talkie', desc: 'Watch a 60s ad to unlock the mic for 3h.', claim: 'Unlock Mic' }
+  };
+  let vMode = 'earn', vLeft = 0, vTimer = null, vRunning = false;
+  function vPaint() { const m = MODES[vMode]; q('vaultCountdown').textContent = vLeft; q('vaultProgress').style.width = ((m.secs - vLeft) / m.secs * 100) + '%'; }
+  function vaultReset() { clearInterval(vTimer); vTimer = null; vRunning = false; q('vaultPaused').hidden = true; }
+  function openVault(mode) {
+    vaultReset(); vMode = mode; const m = MODES[mode]; vLeft = m.secs;
+    q('vaultTitle').textContent = m.title; q('vaultDesc').textContent = m.desc; q('btnVaultClaim').textContent = m.claim;
+    q('btnVaultStart').hidden = false; q('btnVaultStart').disabled = false; q('btnVaultClaim').hidden = true; q('btnVaultClaim').disabled = true; vPaint(); openModal('vaultModal');
+  }
+  q('btnVaultStart').addEventListener('click', () => {
+    q('btnVaultStart').disabled = true; vRunning = true;
+    vTimer = setInterval(() => {
+      if (document.hidden) { q('vaultPaused').hidden = false; return; }
+      q('vaultPaused').hidden = true; vLeft--; vPaint();
+      if (vLeft <= 0) { vaultReset(); q('btnVaultStart').hidden = true; q('btnVaultClaim').hidden = false; q('btnVaultClaim').disabled = false; q('btnVaultClaim').focus(); }
+    }, 1000);
+  });
+  q('btnVaultClaim').addEventListener('click', () => {
+    if (vMode === 'earn') { setCoins(coins + 1); say('+1 DropCoin added 🪙'); } else unlock(vMode === 'chat' ? 'chat' : 'ptt');
+    closeModal('vaultModal');
+  });
+  document.addEventListener('visibilitychange', () => { if (vRunning && !document.hidden) q('vaultPaused').hidden = true; });
+
+  /* ---------- Tabs ---------- */
+  const tabs = Array.from(document.querySelectorAll('.ws-tab'));
+  function selectTab(btn, focus) {
+    tabs.forEach(t => { const on = t === btn; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; q(t.dataset.tab).classList.toggle('active', on); });
+    btn.scrollIntoView({ block: 'nearest', inline: 'center' }); if (focus) btn.focus();
+    if (btn.dataset.tab === 'wsWalkie') startViz(); else stopViz();
+    if (btn.dataset.tab === 'wsChat') { const v = q('chatViewport'); v.scrollTop = v.scrollHeight; }
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => selectTab(t));
+    t.addEventListener('keydown', e => { const k = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (k) { e.preventDefault(); selectTab(tabs[(i + k + tabs.length) % tabs.length], true); } });
+  });
+
+  /* ---------- Chat ---------- */
+  const fmtTime = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  function addMessage(m) {
+    const empty = q('chatEmpty'); if (empty) empty.remove();
+    const me = m.from === 'me', who = me ? profile : { name: m.name || peer.name, avatar: m.avatar || '' };
+    const row = document.createElement('div'); row.className = 'msg ' + (me ? 'me' : 'them');
+    const av = document.createElement('span'); av.className = 'avatar sm'; paintAvatar(av, who);
+    const b = document.createElement('div'); b.className = 'bubble';
+    const meta = document.createElement('div'); meta.className = 'msg-meta';
+    const nm = document.createElement('span'); nm.className = 'msg-name'; nm.textContent = me ? 'You' : who.name;
+    const tm = document.createElement('time'); tm.textContent = fmtTime(m.time ? new Date(m.time) : new Date());
+    meta.append(nm, tm);
+    const body = document.createElement('p'); body.className = 'msg-body'; body.textContent = m.text;
+    b.append(meta, body); row.append(av, b);
+    const v = q('chatViewport'); v.append(row); v.scrollTop = v.scrollHeight;
+  }
+  function sendChat() { const i = q('chatInput'), t = i.value.trim(); if (!t) return; addMessage({ from: 'me', text: t }); emit('chat-send', { text: t }); i.value = ''; i.focus(); }
+  q('btnChatSend').addEventListener('click', sendChat);
+  q('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); sendChat(); } });
+  let recT = null, recS = 0;
+  q('btnVoiceNote').addEventListener('click', () => {
+    const on = q('btnVoiceNote').getAttribute('aria-pressed') !== 'true';
+    q('btnVoiceNote').setAttribute('aria-pressed', on); q('recIndicator').hidden = !on; clearInterval(recT);
+    if (on) { recS = 0; q('recTime').textContent = '0:00'; recT = setInterval(() => { recS++; q('recTime').textContent = Math.floor(recS / 60) + ':' + String(recS % 60).padStart(2, '0'); }, 1000); emit('voice-note', { state: 'start' }); }
+    else emit('voice-note', { state: 'stop', seconds: recS });
+  });
+
+  /* ---------- Walkie-talkie ---------- */
+  const ptt = q('btnPTT'); let talking = false;
+  function pttSet(on) {
+    if (on === talking || q('walkieLock').classList.contains('show')) return;
+    talking = on; ptt.classList.toggle('active', on); ptt.setAttribute('aria-pressed', on);
+    q('pttHint').textContent = on ? 'Transmitting… release to stop.' : 'Press and hold to transmit. Release to stop.'; emit('ptt', { talking: on });
+  }
+  ptt.addEventListener('pointerdown', e => { e.preventDefault(); try { ptt.setPointerCapture(e.pointerId); } catch (x) {} pttSet(true); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => ptt.addEventListener(ev, () => pttSet(false)));
+  ptt.addEventListener('contextmenu', e => e.preventDefault());
+  ptt.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); pttSet(true); } });
+  ptt.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') pttSet(false); });
+  let speaking = false;
+  function setSpeaking(name) { speaking = !!name; const b = q('speakerBanner'); b.classList.toggle('live', speaking); q('speakerText').textContent = speaking ? name + ' is speaking live…' : 'Channel idle'; }
+  const cv = q('waveCanvas'), cx = cv.getContext('2d'); let raf = 0, tt = 0;
+  function fit() { const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1; if (!r.width) return; cv.width = Math.round(r.width * d); cv.height = Math.round(96 * d); cx.setTransform(d, 0, 0, d, 0, 0); }
+  function frame() {
+    const w = cv.clientWidth, h = 96, n = Math.max(12, Math.floor(w / 8)), amp = (talking || speaking) ? 1 : 0.08;
+    cx.clearRect(0, 0, w, h); cx.fillStyle = '#3ddc97'; tt += 0.08;
+    for (let i = 0; i < n; i++) { const x = (i + 0.5) * (w / n), env = Math.sin((i / n) * Math.PI), v = (Math.sin(tt + i * 0.55) * 0.5 + 0.5) * (0.4 + 0.6 * Math.abs(Math.sin(tt * 1.7 + i))), bh = Math.max(3, v * env * amp * (h - 16)); cx.globalAlpha = 0.35 + 0.65 * env; cx.fillRect(x - 2, (h - bh) / 2, 4, bh); }
+    cx.globalAlpha = 1; raf = requestAnimationFrame(frame);
+  }
+  function startViz() { fit(); if (!raf) frame(); }
+  function stopViz() { cancelAnimationFrame(raf); raf = 0; }
+  window.addEventListener('resize', () => { if (raf) fit(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopViz(); else if (q('wsWalkie').classList.contains('active')) startViz(); });
+
+  /* ---------- Room & privacy ---------- */
+  let peer = { name: 'No peer connected', handle: '', avatar: '', online: false, ping: null };
+  function setPeer(p) {
+    peer = Object.assign(peer, p || {});
+    document.querySelectorAll('[data-peer-name]').forEach(e => e.textContent = peer.name);
+    document.querySelectorAll('[data-peer-avatar]').forEach(e => paintAvatar(e, { name: peer.online ? peer.name : '?', avatar: peer.avatar }));
+    document.querySelectorAll('[data-peer-status]').forEach(e => e.textContent = peer.online ? 'Connected' : 'Not connected');
+    q('peerHandle').textContent = peer.handle ? '@' + peer.handle.replace(/^@/, '') : '—';
+    q('peerPing').textContent = peer.ping == null ? '— ms' : peer.ping + ' ms';
+    q('peerStatusPill').dataset.state = peer.online ? 'online' : 'idle';
+    renderBlock();
+  }
+  const blocklist = () => store.get('dropp2p_blocklist', []);
+  const peerKey = () => peer.handle ? peer.handle.replace(/^@/, '').toLowerCase() : '';
+  function renderBlock() { const b = !!peerKey() && blocklist().indexOf(peerKey()) > -1; q('btnBlockPeer').setAttribute('aria-pressed', b); q('btnBlockPeer').querySelector('.mod-txt').textContent = b ? 'Unblock' : 'Block Peer'; }
+  let muted = store.get('dropp2p_muted', false);
+  function renderMute() { q('btnMutePeer').setAttribute('aria-pressed', muted); q('btnMutePeer').querySelector('.mod-ico').textContent = muted ? '🔕' : '🔔'; q('btnMutePeer').querySelector('.mod-txt').textContent = muted ? 'Unmute' : 'Mute'; }
+  renderMute();
+  q('btnMutePeer').addEventListener('click', () => { muted = !muted; store.set('dropp2p_muted', muted); renderMute(); emit('mute', { muted }); say(muted ? 'Peer muted on this device' : 'Peer unmuted'); });
+  q('btnBlockPeer').addEventListener('click', () => {
+    const k = peerKey(); if (!k) { say('No peer connected'); return; }
+    let l = blocklist(), has = l.indexOf(k) > -1;
+    if (has) l = l.filter(x => x !== k); else { l.push(k); try { if (typeof activeConn !== 'undefined' && activeConn) activeConn.close(); } catch (e) {} }
+    store.set('dropp2p_blocklist', l); renderBlock(); emit('block', { handle: k, blocked: !has }); say(has ? 'Peer unblocked' : 'Peer blocked — session closed');
+  });
+
+  /* ---------- Inbound consent ---------- */
+  function requestConsent(o) {
+    return new Promise(res => {
+      q('consentHandle').textContent = '@' + String(o.handle || 'peer').replace(/^@/, ''); q('consentFile').textContent = o.filename || 'file'; q('consentSize').textContent = o.size || '';
+      const done = v => { q('consentModal').classList.remove('show'); q('btnConsentAccept').onclick = q('btnConsentDecline').onclick = null; res(v); };
+      q('btnConsentAccept').onclick = () => done(true); q('btnConsentDecline').onclick = () => done(false);
+      q('consentModal').classList.add('show'); q('btnConsentAccept').focus();
+    });
+  }
+
+  window.DropUI = { addMessage, setCoins, getCoins: () => coins, setPeer, setSpeaking, requestConsent, openVault, selectTab: id => { const b = tabs.find(t => t.dataset.tab === id); if (b) selectTab(b); } };
+})();
+</script>
+<script id="drawer-ui">
+/* Opens the SEO drawer when a footer/anchor link targets content inside it */
+(function () {
+  var d = document.querySelector('.seo-accordion'); if (!d) return;
+  function reveal() {
+    var h = location.hash; if (h.length < 2) return; var t;
+    try { t = document.querySelector(h); } catch (e) { return; }
+    if (t && d.contains(t)) { d.open = true; setTimeout(function () { t.scrollIntoView(); }, 60); }
+  }
+  window.addEventListener('hashchange', reveal); reveal();
+})();
+</script>
+</body>
+</html>
