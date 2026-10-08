@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content" />
 <meta name="theme-color" content="#0b0c0e" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='36' y2='36' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%234f8cff'/%3E%3Cstop offset='1' stop-color='%237c5cff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='36' height='36' rx='11' fill='url(%23g)'/%3E%3Cpath d='M18 6.500c0 0-8 8.400-8 14a8 8 0 0 0 16 0c0-5.600-8-14-8-14z' fill='%23fff'/%3E%3Cpath d='M14.600 21.500h6.800' stroke='url(%23g)' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='14.200' cy='21.500' r='2.300' fill='url(%23g)'/%3E%3Ccircle cx='21.800' cy='21.500' r='2.300' fill='url(%23g)'/%3E%3C/svg%3E" />
 <title>DropP2P — Serverless P2P File Sharing, Chat & Walkie-Talkie</title>
 <meta name="description" content="DropP2P is a 100% serverless peer-to-peer app for direct file sharing, real-time chat, voice notes and walkie-talkie audio over encrypted WebRTC. No servers. No accounts. No tracking." />
 
@@ -564,6 +565,103 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .block-chip button{width:20px;height:20px;border-radius:50%;background:var(--bg-elevated);font-size:10px;color:var(--text-muted);}
 .files-panel.dragging .dropzone{border-color:var(--accent-blue);background:rgba(59,130,246,.08);}
 .ts-save{color:var(--accent-green);font-weight:800;text-decoration:none;}
+
+/* ============================================================
+   THEME v2 :: layout fix (scrolling) + refreshed look
+   ============================================================ */
+:root{
+  --bg-primary:#0a0e1a; --bg-secondary:#0f1526; --bg-tertiary:#161d32; --bg-elevated:#1f2842;
+  --border-subtle:#222b45; --border-strong:#303b5e;
+  --text-secondary:#c2c8d8; --text-muted:#8089a3;
+  --accent-blue:#4f8cff; --accent-blue-hover:#3d79ec;
+  --grad:linear-gradient(135deg,#4f8cff 0%,#7c5cff 100%);
+  --radius-md:16px; --radius-lg:22px;
+}
+html,body{height:100%;}
+body{
+  height:100dvh;min-height:0;overflow:hidden;
+  background:radial-gradient(120% 55% at 50% -8%,#1c2754 0%,#0a0e1a 60%) no-repeat,#0a0e1a;
+}
+/* the real scroll fix: main must SHRINK to the screen instead of growing past it */
+.app-main{flex:1 1 0;min-height:0;overflow:hidden;background:transparent;}
+.workspace-panel{min-height:0;}
+.chat-viewport{min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding:14px 12px 18px;scroll-behavior:smooth;}
+.ptt-panel,.files-panel,.room-panel{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+
+/* header & status bar */
+.app-header{background:rgba(15,21,38,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-subtle);padding-top:calc(8px + var(--safe-top));padding-bottom:8px;}
+.brand-name{font-size:17px;}
+.brand-name span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.coin-pill,.profile-pill{background:var(--bg-tertiary);border-color:var(--border-strong);}
+.coin-earn{background:linear-gradient(135deg,#fbbf24,#f59e0b);box-shadow:0 2px 8px rgba(245,158,11,.35);}
+.pairing-bar{background:transparent;padding:8px 14px;border-bottom:none;}
+.pb-status{font-size:12.5px;color:var(--text-secondary);}
+.pb-btn{background:var(--grad);box-shadow:0 3px 12px rgba(79,140,255,.35);}
+.pb-btn.ghosted{background:var(--bg-tertiary);box-shadow:none;}
+
+/* tabs: segmented control */
+.tabs{margin:4px 12px 8px;padding:4px;gap:4px;border:1px solid var(--border-subtle);
+  border-radius:var(--radius-pill);background:var(--bg-secondary);}
+.workspace-tab{padding:9px 2px;border-radius:var(--radius-pill);background:transparent;
+  font-size:12.5px;font-weight:700;color:var(--text-muted);}
+.workspace-tab.active{background:var(--grad);color:#fff;box-shadow:0 3px 12px rgba(79,140,255,.4);}
+
+/* locked / empty states: smaller, calmer, single */
+.chat-lock,.chat-empty{gap:8px;padding:24px;}
+.chat-lock .cl-icon,.chat-empty .ce-icon{
+  width:64px;height:64px;border-radius:50%;font-size:28px;display:flex;align-items:center;justify-content:center;
+  background:var(--bg-tertiary);border:1px solid var(--border-strong);margin-bottom:4px;}
+.chat-lock .cl-title{font-size:15px;}
+.chat-lock .cl-sub{font-size:12px;opacity:.85;}
+
+/* chat bubbles */
+.chat-bubble{background:var(--bg-tertiary);border-color:var(--border-subtle);}
+.chat-row.mine .chat-bubble{background:var(--grad);box-shadow:0 3px 12px rgba(79,140,255,.25);}
+
+/* composer */
+.composer{background:var(--bg-secondary);border-top:1px solid var(--border-subtle);
+  padding:10px 12px calc(10px + var(--safe-bottom));align-items:center;}
+.composer-input{border-radius:22px;padding:11px 16px;background:var(--bg-tertiary);}
+.composer-btn{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--bg-tertiary);
+  border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.composer-btn.send{background:var(--grad);border-color:transparent;box-shadow:0 3px 12px rgba(79,140,255,.4);}
+
+/* cards & modals */
+.room-card,.room-row,.transfer-card,.floor-person{background:var(--bg-tertiary);border-color:var(--border-subtle);}
+.dropzone{background:rgba(79,140,255,.04);border-color:var(--border-strong);}
+.modal-card{background:var(--bg-secondary);border:1px solid var(--border-strong);border-radius:24px;}
+.modal-btn.primary{background:var(--grad);}
+.seo-drawer{padding:4px 0 6px;}
+@media(max-width:400px){
+  .app-header{gap:6px;padding-left:10px;padding-right:10px;}
+  .brand{gap:6px;} .brand svg{width:22px;height:22px;} .brand-name{font-size:15px;}
+  .header-right{gap:5px;}
+  .coin-pill{padding:4px 4px 4px 9px;gap:4px;font-size:12px;} .coin-earn{padding:4px 8px;font-size:10.5px;}
+  .profile-pill{padding:4px 9px 4px 4px;gap:5px;} .pp-handle{max-width:58px;font-size:11.5px;}
+}
+
+/* ---- Header v3: logo-only brand, compact profile pill ---- */
+.app-header{padding:calc(8px + var(--safe-top)) 12px 8px;gap:8px;}
+.brand{gap:0;}
+.brand svg{width:36px;height:36px;border-radius:11px;filter:drop-shadow(0 4px 12px rgba(79,140,255,.45));}
+.brand-name{display:none;}
+.header-right{margin-left:auto;gap:8px;}
+.coin-pill{padding:4px 5px 4px 11px;gap:6px;font-size:13px;}
+.coin-earn{padding:5px 10px;font-size:11px;}
+.profile-pill{padding:3px 12px 3px 3px;gap:7px;max-width:140px;}
+.profile-pill img,.profile-pill .avatar-fallback{width:30px;height:30px;}
+.pp-handle{max-width:86px;font-size:12.5px;font-weight:700;color:var(--text-primary);}
+@media(max-width:400px){
+  .brand svg{width:34px;height:34px;}
+  .header-right{gap:6px;}
+  .coin-pill{padding:3px 4px 3px 9px;gap:5px;font-size:12.5px;}
+  .coin-earn{padding:5px 9px;font-size:10.5px;}
+  .profile-pill{padding:3px 10px 3px 3px;gap:6px;}
+  .pp-handle{max-width:68px;font-size:12px;}
+}
+.toast-stack{bottom:auto;top:calc(64px + var(--safe-top));}
 </style>
 </head>
 <body>
@@ -604,8 +702,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 <!-- ================= HEADER ================= -->
 <header class="app-header">
   <div class="brand">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#3b82f6"/><path d="M16 8v11m0 0l-4.5-4.5M16 19l4.5-4.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23h14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
-    <div class="brand-name">Drop<span>P2P</span></div>
+    <svg viewBox="0 0 36 36" fill="none" role="img" aria-label="App logo">
+      <defs><linearGradient id="lgG" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#4f8cff"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs>
+      <rect width="36" height="36" rx="11" fill="url(#lgG)"/>
+      <path d="M10.500 23C10.500 10.500 25.500 10.500 25.500 23" stroke="#fff" stroke-width="2.600" stroke-linecap="round"/>
+      <path d="M22.300 19.300L25.500 23L28.700 19.300" stroke="#fff" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="10.500" cy="24.500" r="3.700" fill="#fff"/>
+      <circle cx="25.500" cy="24.500" r="3.700" fill="#fff" fill-opacity=".92"/>
+    </svg>
   </div>
   <div class="header-right">
     <div class="coin-pill">🪙 <span id="coinCount">0</span>
@@ -613,7 +717,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
     </div>
     <button class="profile-pill" id="profilePillBtn">
       <span id="ppAvatarWrap"><span class="avatar-fallback" id="ppFallback">?</span></span>
-      <span class="pp-handle" id="ppHandle">@you</span>
+      <span class="pp-handle" id="ppHandle">You</span>
     </button>
   </div>
 </header>
@@ -699,6 +803,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
         <div id="youAvatar"><div class="avatar-tile"><span class="at-fallback">?</span></div></div>
         <div class="rc-name" id="youName">Waiting…</div>
         <div class="rc-handle" id="youHandle">not paired</div>
+        <div class="rc-sub" id="youPresence">⚪ Offline</div>
       </div>
     </div>
     <div class="ball-floor" id="ballFloor" title="Tap to bounce the ball"></div>
@@ -712,9 +817,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
       <div class="rr-label" style="margin-bottom:8px;">Blocked handles</div>
       <div class="block-list" id="blocklist"></div>
     </div>
-    <div class="room-note">🔒 Blocking is stored locally on your device. Blocked peers cannot reconnect to you from this browser.</div>
-  </section>
-
   <!-- SEO DRAWER -->
   <section class="seo-drawer">
     <details class="seo-details">
@@ -737,6 +839,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
       </div>
     </details>
   </section>
+    <div class="room-note">🔒 Blocking is stored locally on your device. Blocked peers cannot reconnect to you from this browser.</div>
+  </section>
 </main>
 
 <!-- ================= PROFILE MODAL ================= -->
@@ -748,7 +852,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
     <input class="field-input" id="nameInput" maxlength="24" placeholder="e.g. Alex" />
     <div class="field-label">Unique Handle</div>
     <input class="field-input" id="handleInput" maxlength="16" placeholder="e.g. alex_q" autocapitalize="off" />
-    <div class="field-hint">Lowercase letters, numbers and underscores (3–16 chars). Shown as @handle.</div>
+    <div class="field-hint" id="handleHint">Lowercase letters, numbers and underscores (3–16 chars). Shown as @handle.</div>
     <div class="avatar-row">
       <img class="avatar-preview" id="avatarPreview" alt="Avatar preview" />
       <div class="avatar-actions">
@@ -809,6 +913,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
   </div>
 </div>
 
+<!-- ================= WALKIE SESSION MODAL ================= -->
+<div class="modal-overlay hidden" id="walkieModal">
+  <div class="modal-card" style="text-align:center;">
+    <img class="consent-avatar" id="walkieAvatar" alt="" />
+    <div class="consent-title"><span class="c-name" id="walkiePeer"></span> wants to open live Walkie-Talkie</div>
+    <div class="modal-sub">Their voice plays through your speaker only while they hold the button. You can mute the speaker anytime.</div>
+    <div class="modal-actions">
+      <button class="modal-btn danger" id="walkieDeclineBtn">Decline</button>
+      <button class="modal-btn success" id="walkieAcceptBtn">Accept</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= GATE MODAL (sender unlock / receiver finalize) ================= -->
 <div class="modal-overlay hidden" id="gateModal">
   <div class="modal-card">
@@ -843,7 +960,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
       <div class="as-sub" id="vaultStageSub"></div>
     </div>
     <div class="stages-row" id="vaultStages"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="ad-head"><span class="ah-label">⏳ Keep this screen open</span>
+    <div class="ad-head"><span class="ah-label" id="vaultHeadLabel">⏳ Keep this screen open</span>
       <span class="ad-timer" id="vaultTimer">90s</span></div>
     <div class="ad-progress"><div class="ap-fill" id="vaultFill"></div></div>
     <div class="ad-actions">
@@ -862,6 +979,66 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
    DropP2P :: single-file production build (Phases 1–6, patches F-01..F-10)
    ============================================================================ */
 'use strict';
+
+/* ============================ SITE CONFIG ============================ */
+const SITE_CONFIG = {
+  name: 'DropP2P',
+  url: 'https://dropp2p.pages.dev',
+  email: 'Hello.devdesk@gmail.com',
+  passDurationHours: 3,
+  liveAdStages: 4,      // 4 x 15s = 60s
+  vaultAdStages: 6,     // 6 x 15s = 90s
+  stageSeconds: 15,
+  welcomeCoins: 500     // one-time free DropCoins for every user
+};
+
+/* ===================== STORAGE KEYS + MIGRATION ===================== */
+const KEYS = {
+  name: 'dropp2p_name', handle: 'dropp2p_handle', avatar: 'dropp2p_avatar',
+  ghost: 'dropp2p_ghost_mode', blocked: 'dropp2p_blocked', coins: 'dropp2p_coins',
+  welcomeFlag: 'dropp2p_welcome_bonus',
+  room: 'dropp2p_saved_room', role: 'dropp2p_saved_role', peer: 'dropp2p_saved_peer',
+  peerCache: 'dropp2p_peer_cache_',
+  expiry: { chat: 'dropp2p_chat_expiry', mic: 'dropp2p_walkie_expiry', files: 'dropp2p_send_expiry' }
+};
+const isFeatureActive = (key) => Date.now() < (parseInt(localStorage.getItem(key) || '0', 10) || 0);
+const isGhostMode = () => localStorage.getItem(KEYS.ghost) === 'true';
+
+/* Free welcome coins: given once per device/user, then coins are earned by watching ads */
+function grantWelcomeCoins() {
+  try {
+    if (localStorage.getItem(KEYS.welcomeFlag)) return false;
+    const cur = parseInt(localStorage.getItem(KEYS.coins) || '0', 10) || 0;
+    localStorage.setItem(KEYS.coins, String(cur + SITE_CONFIG.welcomeCoins));
+    localStorage.setItem(KEYS.welcomeFlag, '1');
+    return true;
+  } catch (e) { return false; }
+}
+
+/* One-time upgrade from the older key layout (keeps existing users' data) */
+(function migrateStorage() {
+  try {
+    const ls = localStorage;
+    const oldProfile = ls.getItem('dropp2p_profile');
+    if (oldProfile) {
+      const p = JSON.parse(oldProfile) || {};
+      if (!ls.getItem(KEYS.name) && p.name) ls.setItem(KEYS.name, p.name);
+      if (!ls.getItem(KEYS.handle) && p.handle) ls.setItem(KEYS.handle, p.handle);
+      if (!ls.getItem(KEYS.avatar) && p.avatar) ls.setItem(KEYS.avatar, p.avatar);
+      ls.removeItem('dropp2p_profile');
+    }
+    const og = ls.getItem('dropp2p_ghost');
+    if (og !== null) { if (!ls.getItem(KEYS.ghost)) ls.setItem(KEYS.ghost, og === '1' ? 'true' : 'false'); ls.removeItem('dropp2p_ghost'); }
+    const ob = ls.getItem('dropp2p_blocklist');
+    if (ob !== null) { if (!ls.getItem(KEYS.blocked)) ls.setItem(KEYS.blocked, ob); ls.removeItem('dropp2p_blocklist'); }
+    const op = ls.getItem('dropp2p_passes');
+    if (op) {
+      const passMs = SITE_CONFIG.passDurationHours * 3600 * 1000, old = JSON.parse(op) || {};
+      Object.keys(KEYS.expiry).forEach(ch => { if (typeof old[ch] === 'number' && !ls.getItem(KEYS.expiry[ch])) ls.setItem(KEYS.expiry[ch], String(old[ch] + passMs)); });
+      ls.removeItem('dropp2p_passes');
+    }
+  } catch (e) { /* storage unavailable — app still runs */ }
+})();
 
 /* ============================ CORE UTILITIES ============================ */
 const $ = (id) => document.getElementById(id);
@@ -896,12 +1073,49 @@ const HAPTIC = DropP2P.HAPTIC;
    IDENTITY :: PROFILE ENGINE (Phase 1) — canvas avatar compressor
    ============================================================================ */
 const Identity = (() => {
-  const KEY = 'dropp2p_profile';
   let profile = null;
   let pendingAvatar = null;   // base64 staged in modal
   let locked = false;
 
-  const load = () => { try { profile = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { profile = null; } return profile; };
+  const load = () => {
+    const name = localStorage.getItem(KEYS.name), handle = localStorage.getItem(KEYS.handle);
+    profile = (name && handle) ? { name, handle, avatar: localStorage.getItem(KEYS.avatar) || '' } : null;
+    return profile;
+  };
+
+  /* ---- Handle uniqueness: claim an id on the PeerJS signaling network ---- */
+  let claimPeer = null, claimed = null;
+  function claimHandle(handle, timeoutMs) {
+    if (claimed === handle && claimPeer && !claimPeer.destroyed) return Promise.resolve('ok');
+    if (typeof Peer === 'undefined') return Promise.resolve('offline');
+    return new Promise((resolve) => {
+      let done = false, p = null;
+      const fin = (r) => { if (done) return; done = true; clearTimeout(t); resolve(r); };
+      const t = setTimeout(() => { try { p && p.destroy(); } catch (e) {} fin('offline'); }, timeoutMs || 7000);
+      try { p = new Peer('dropp2p-user-' + handle); } catch (e) { fin('offline'); return; }
+      p.on('open', () => {
+        if (claimPeer && claimPeer !== p) { try { claimPeer.destroy(); } catch (e) {} }
+        claimPeer = p; claimed = handle; fin('ok');
+      });
+      p.on('error', (err) => {
+        if (err && err.type === 'unavailable-id') fin('taken');
+        else { try { p.destroy(); } catch (e) {} fin('offline'); }
+      });
+      p.on('connection', (c) => { try { c.close(); } catch (e) {} });
+    });
+  }
+  /* Silent re-claim at startup so the handle stays "actively connected" */
+  async function ensureClaim() {
+    if (!profile) return;
+    let r = await claimHandle(profile.handle);
+    if (r === 'taken') { await new Promise(res => setTimeout(res, 4000)); r = await claimHandle(profile.handle); }
+    if (r === 'taken') toast(`Username @${profile.handle} is already taken. Please choose another.`, 'error');
+  }
+  const setHandleHint = (msg, bad) => {
+    const el = $('handleHint'); if (!el) return;
+    el.textContent = msg || 'Lowercase letters, numbers and underscores (3–16 chars). Shown as @handle.';
+    el.style.color = bad ? 'var(--accent-red)' : '';
+  };
   const exists = () => !!profile;
   const get = () => profile;
 
@@ -942,10 +1156,10 @@ const Identity = (() => {
       wrap.innerHTML = profile.avatar
         ? `<img src="${profile.avatar}" alt="">`
         : `<span class="avatar-fallback">${esc(profile.name[0] || '?').toUpperCase()}</span>`;
-      handle.textContent = '@' + profile.handle;
+      handle.textContent = (profile.name || 'You').trim().split(/\s+/)[0];
     } else {
       wrap.innerHTML = `<span class="avatar-fallback">?</span>`;
-      handle.textContent = '@you';
+      handle.textContent = 'You';
     }
   }
 
@@ -961,20 +1175,32 @@ const Identity = (() => {
   }
   const close = () => { if (!locked) $('profileModal').classList.add('hidden'); };
 
-  function save() {
+  async function save() {
     const name = $('nameInput').value.trim();
     // Handle is auto-sanitized: lowercase alphanumeric + underscore only
     const handle = $('handleInput').value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 16);
     if (name.length < 1) { toast('Please enter a display name', 'error'); return; }
     if (handle.length < 3) { toast('Handle needs 3+ letters/numbers', 'error'); return; }
+    const btn = $('profileSaveBtn'), label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Checking username…';
+    const res = await claimHandle(handle);
+    btn.disabled = false; btn.textContent = label;
+    if (res === 'taken') {
+      const msg = `Username @${handle} is already taken. Please choose another.`;
+      setHandleHint(msg, true); toast(msg, 'error'); return;
+    }
+    if (res === 'offline') toast('Could not verify username online — saved locally');
+    setHandleHint('');
     const finalAvatar = pendingAvatar || initialsAvatar(name);
-    profile = { name, handle, avatar: finalAvatar, created: Date.now() };
-    localStorage.setItem(KEY, JSON.stringify(profile));
-    // Welcome bonus for brand-new identities
-    if (!localStorage.getItem('dropp2p_coins')) localStorage.setItem('dropp2p_coins', '2');
+    profile = { name, handle, avatar: finalAvatar };
+    localStorage.setItem(KEYS.name, name);
+    localStorage.setItem(KEYS.handle, handle);
+    localStorage.setItem(KEYS.avatar, finalAvatar);
+    // One-time free welcome coins (new users)
+    const gotBonus = grantWelcomeCoins();
     renderHeader(); Coins.renderBalance();
     locked = false; close();
-    toast(`Welcome, ${name}! 2 DropCoins added 🪙`, 'success');
+    toast(gotBonus ? `Welcome, ${name}! ${SITE_CONFIG.welcomeCoins} free DropCoins added 🪙` : `Welcome back, ${name}!`, 'success');
     if (window.DropP2PFinal) DropP2PFinal.onProfileReady();
   }
 
@@ -995,13 +1221,14 @@ const Identity = (() => {
     // Live-sanitize handle + live initials preview
     $('handleInput').addEventListener('input', (e) => {
       e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      setHandleHint('');
     });
     $('nameInput').addEventListener('input', () => {
       if (!pendingAvatar) $('avatarPreview').src = initialsAvatar($('nameInput').value || '?');
     });
   }
 
-  return { load, exists, get, open, close, save, renderHeader, initialsAvatar, init };
+  return { load, exists, get, open, close, save, renderHeader, initialsAvatar, init, ensureClaim, claimHandle };
 })();
 
 /* ============================================================================
@@ -1009,19 +1236,19 @@ const Identity = (() => {
    ============================================================================ */
 const Coins = (() => {
   const COIN_KEY = 'dropp2p_coins';
-  const PASS_KEY = 'dropp2p_passes';
-  const PASS_MS = 3 * 60 * 60 * 1000;               // 3-hour passes
-  const VAULT_SEC = 90, VAULT_STAGES = 6;           // 6 × 15s
-  const AD_SEC = 60, AD_STAGES = 4;                 // 4 × 15s
+  const PASS_MS = SITE_CONFIG.passDurationHours * 60 * 60 * 1000;
+  const STAGE_SEC = SITE_CONFIG.stageSeconds;
+  const VAULT_STAGES = SITE_CONFIG.vaultAdStages, VAULT_SEC = VAULT_STAGES * STAGE_SEC;   // 6 × 15s = 90s
+  const AD_STAGES = SITE_CONFIG.liveAdStages, AD_SEC = AD_STAGES * STAGE_SEC;             // 4 × 15s = 60s
+  const dots = (n) => '<i></i>'.repeat(n);
 
   const balance = () => parseInt(localStorage.getItem(COIN_KEY) || '0', 10) || 0;
   const add = (n) => { localStorage.setItem(COIN_KEY, String(balance() + n)); renderBalance(); };
   const spend = (n) => { if (balance() < n) return false; localStorage.setItem(COIN_KEY, String(balance() - n)); renderBalance(); return true; };
 
-  const passes = () => { try { return JSON.parse(localStorage.getItem(PASS_KEY) || '{}'); } catch (e) { return {}; } };
-  const passActive = (ch) => { const p = passes()[ch]; return typeof p === 'number' && Date.now() < p + PASS_MS; };
-  const grantPass = (ch) => { const p = passes(); p[ch] = Date.now(); localStorage.setItem(PASS_KEY, JSON.stringify(p)); };
-  const passLeft = (ch) => { const p = passes()[ch]; return passActive(ch) ? Math.ceil((p + PASS_MS - Date.now()) / 60000) : 0; };
+  const passActive = (ch) => isFeatureActive(KEYS.expiry[ch]);
+  const grantPass = (ch) => localStorage.setItem(KEYS.expiry[ch], String(Date.now() + PASS_MS));
+  const passLeft = (ch) => passActive(ch) ? Math.ceil((parseInt(localStorage.getItem(KEYS.expiry[ch]), 10) - Date.now()) / 60000) : 0;
 
   const renderBalance = () => {
     $('coinCount').textContent = balance();
@@ -1059,8 +1286,10 @@ const Coins = (() => {
         const remain = Math.max(0, totalSec - elapsed);
         ui.timer.textContent = remain > 0.05 ? Math.ceil(remain) + 's' : 'Ready!';
         ui.fill.style.width = Math.min(100, (elapsed / totalSec) * 100) + '%';
-        const si = Math.min(creatives.length - 1, Math.floor(elapsed / stageSec));
-        const cr = creatives[si];
+        const nStages = Math.max(1, Math.round(totalSec / stageSec));
+        const si = Math.min(nStages - 1, Math.floor(elapsed / stageSec));
+        const cr = creatives[si % creatives.length];
+        if (ui.label && elapsed < totalSec) ui.label.textContent = `Stage ${si + 1} of ${nStages} (${totalSec}s total) — ${Math.max(1, Math.ceil(stageSec - (elapsed - si * stageSec)))}s remaining`;
         ui.icon.textContent = cr.i; ui.title.textContent = cr.t; ui.sub.textContent = cr.s;
         ui.stages.querySelectorAll('i').forEach((d, k) => d.classList.toggle('on', k <= si));
         if (elapsed >= totalSec) {
@@ -1077,12 +1306,13 @@ const Coins = (() => {
   function openVault() {
     const ui = {
       icon: $('vaultStageIcon'), title: $('vaultStageTitle'), sub: $('vaultStageSub'),
-      stages: $('vaultStages'), timer: $('vaultTimer'), fill: $('vaultFill')
+      stages: $('vaultStages'), timer: $('vaultTimer'), fill: $('vaultFill'), label: $('vaultHeadLabel')
     };
+    ui.stages.innerHTML = dots(VAULT_STAGES);
     $('vaultModal').classList.remove('hidden');
     $('vaultClaimBtn').disabled = true; $('vaultCancelBtn').disabled = false;
     ui.timer.classList.remove('ready'); ui.fill.style.width = '0%';
-    const run = runWatch(VAULT_SEC, VAULT_SEC / VAULT_STAGES, VAULT_CREATIVES, ui);
+    const run = runWatch(VAULT_SEC, STAGE_SEC, VAULT_CREATIVES, ui);
     $('vaultClaimBtn').onclick = () => {
       if (!run._done) return;
       run.cancel();
@@ -1092,7 +1322,7 @@ const Coins = (() => {
       if (window.confetti) confetti({ particleCount: 130, spread: 75, origin: { y: 0.7 }, colors: ['#f59e0b', '#fbbf24', '#ffffff'] });
     };
     $('vaultCancelBtn').onclick = () => { run.cancel(); $('vaultModal').classList.add('hidden'); };
-    run.promise.then((ok) => { if (ok) { run._done = true; $('vaultClaimBtn').disabled = false; $('vaultCancelBtn').disabled = true; } });
+    run.promise.then((ok) => { if (ok) { run._done = true; $('vaultHeadLabel').textContent = '✅ All stages complete'; $('vaultClaimBtn').disabled = false; $('vaultCancelBtn').disabled = true; } });
   }
 
   /* ------- Gate Modal: sender unlock OR receiver finalize -------
@@ -1117,8 +1347,9 @@ const Coins = (() => {
 
       const ui = {
         icon: $('gateStageIcon'), title: $('gateStageTitle'), sub: $('gateStageSub'),
-        stages: $('gateStages'), timer: $('gateTimer'), fill: $('gateFill')
+        stages: $('gateStages'), timer: $('gateTimer'), fill: $('gateFill'), label: $('gateHeadLabel')
       };
+      ui.stages.innerHTML = dots(AD_STAGES);
       $('gateClaimBtn').disabled = true; $('gateCancelBtn').disabled = false;
 
       $('gateCoinBtn').onclick = () => {
@@ -1127,7 +1358,7 @@ const Coins = (() => {
       };
       $('gateCancelBtn').onclick = () => run.cancel();
 
-      const run = runWatch(AD_SEC, AD_SEC / AD_STAGES, AD_CREATIVES, ui);
+      const run = runWatch(AD_SEC, STAGE_SEC, AD_CREATIVES, ui);
       run.promise.then((ok) => {
         if (!ok) { finish(false); return; }
         $('gateHeadLabel').textContent = '✅ Reward unlocked';
@@ -1143,12 +1374,12 @@ const Coins = (() => {
     if (passActive(channel)) { action(); return; }
     const ok = await openGate({
       title: `${featureLabel} locked`,
-      sub: 'Your free 3-hour pass has expired. Unlock instantly with 1 DropCoin, or watch a short ad for a fresh 3-hour pass.',
+      sub: `Your free ${SITE_CONFIG.passDurationHours}-hour pass has expired. Unlock instantly with 1 DropCoin, or watch a ${AD_SEC}s ad for a fresh ${SITE_CONFIG.passDurationHours}-hour pass.`,
       coinLabel: '🔓 Instant Unlock — Use 1 🪙'
     });
     if (!ok) { toast(`${featureLabel} stays locked — pass not activated`, 'error'); return; }
     grantPass(channel);
-    toast(`${featureLabel} unlocked for 3 hours ⏳`, 'success');
+    toast(`${featureLabel} unlocked for ${SITE_CONFIG.passDurationHours} hours ⏳`, 'success');
     action();
   }
 
@@ -1175,6 +1406,8 @@ const Pairing = (() => {
   };
   let peer = null, conn = null, roomCode = null, isHost = false;
   let peerProfile = null;
+  let hbTimer = null, lastPing = 0, peerOnline = false;
+  const HEARTBEAT_MS = 5000, STALE_MS = 15000;
 
   const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
   const getConnection = () => conn;
@@ -1183,18 +1416,19 @@ const Pairing = (() => {
   /* F-01 support: expose the REAL PeerJS instance (not a string id) */
   const _getPeerInstance = () => peer;
 
-  const blocked = () => { try { return JSON.parse(localStorage.getItem('dropp2p_blocklist') || '[]'); } catch (e) { return []; } };
+  const blocked = () => { try { return JSON.parse(localStorage.getItem(KEYS.blocked) || '[]'); } catch (e) { return []; } };
   const isBlocked = (h) => blocked().includes(h);
-  const addBlock = (h) => { const b = blocked(); if (!b.includes(h)) b.push(h); localStorage.setItem('dropp2p_blocklist', JSON.stringify(b)); };
-  const removeBlock = (h) => localStorage.setItem('dropp2p_blocklist', JSON.stringify(blocked().filter(x => x !== h)));
+  const addBlock = (h) => { const b = blocked(); if (!b.includes(h)) b.push(h); localStorage.setItem(KEYS.blocked, JSON.stringify(b)); };
+  const removeBlock = (h) => localStorage.setItem(KEYS.blocked, JSON.stringify(blocked().filter(x => x !== h)));
 
   function renderBar() {
     const st = $('pbStatus'), btn = $('pairBtn');
     if (isPaired() && peerProfile) {
-      st.textContent = '🟢 Connected with @' + peerProfile.handle;
+      st.textContent = peerOnline ? '🟢 Connected with @' + peerProfile.handle : '⚪ @' + peerProfile.handle + ' · Offline';
       btn.textContent = 'Disconnect'; btn.classList.add('ghosted');
     } else {
-      st.textContent = '⚪ Not Connected';
+      const saved = localStorage.getItem(KEYS.peer);
+      st.textContent = saved ? '⚪ @' + saved + ' Offline' : '⚪ Not Connected';
       btn.textContent = 'Connect Friend'; btn.classList.remove('ghosted');
     }
   }
@@ -1253,13 +1487,40 @@ const Pairing = (() => {
     p.on('open', () => setupConn(p.connect(PREFIX + code, { reliable: true })));
   }
 
+  /* ---- Identity handshake: { type:'profile_sync', name, handle, avatar } ---- */
+  function sendProfile() {
+    const me = Identity.get(); if (!me) return;
+    const ghost = isGhostMode();
+    send({ type: 'profile_sync', name: ghost ? 'Ghost' : me.name, handle: ghost ? 'ghost' : me.handle, avatar: ghost ? '' : me.avatar, ghost });
+  }
+  const getCachedPeer = () => {
+    const hnd = localStorage.getItem(KEYS.peer); if (!hnd) return null;
+    try { return JSON.parse(localStorage.getItem(KEYS.peerCache + hnd) || 'null'); } catch (e) { return null; }
+  };
+
+  /* ---- Presence: 5s heartbeat { type:'presence_ping', handle, isGhost } ---- */
+  function pingNow() {
+    const me = Identity.get(); if (!me) return;
+    const g = isGhostMode();
+    send({ type: 'presence_ping', handle: g ? 'ghost' : me.handle, isGhost: g });
+  }
+  function startHeartbeat() {
+    stopHeartbeat(); pingNow();
+    hbTimer = setInterval(() => {
+      pingNow();
+      if (peerProfile) {
+        const online = !peerProfile.ghost && (Date.now() - lastPing) < STALE_MS;
+        if (online !== peerOnline) { peerOnline = online; renderBar(); Room.render(); }
+      }
+    }, HEARTBEAT_MS);
+  }
+  function stopHeartbeat() { if (hbTimer) { clearInterval(hbTimer); hbTimer = null; } peerOnline = false; }
+
   function setupConn(c) {
     conn = c;
     c.on('open', () => {
       peerProfile = null;
-      const me = Identity.get();
-      const ghost = localStorage.getItem('dropp2p_ghost') === '1';
-      c.send({ type: 'profile', name: ghost ? 'Ghost' : me.name, handle: ghost ? 'ghost' : me.handle, avatar: ghost ? '' : me.avatar, ghost });
+      sendProfile();
       onPaired();
     });
     c.on('data', (d) => { try { onData(d); } catch (e) { console.error('data err', e); } });
@@ -1268,8 +1529,9 @@ const Pairing = (() => {
   }
 
   function onPaired() {
-    localStorage.setItem('dropp2p_saved_room', roomCode);
-    localStorage.setItem('dropp2p_saved_role', isHost ? 'host' : 'guest');
+    localStorage.setItem(KEYS.room, roomCode);
+    localStorage.setItem(KEYS.role, isHost ? 'host' : 'guest');
+    startHeartbeat();
     renderBar(); Chat.onPaired(); Room.render();
     $('pairingModal').classList.add('hidden');
     toast('🟢 Paired! Connection is direct & encrypted.', 'success');
@@ -1278,7 +1540,7 @@ const Pairing = (() => {
 
   function onDisconnected(manual) {
     if (!conn && !peerProfile && !manual) return;
-    conn = null; peerProfile = null;
+    conn = null; peerProfile = null; stopHeartbeat();
     Walkie.onDisconnect(); Files.onDisconnect();
     renderBar(); Chat.onUnpaired(); Room.render();
     if (!manual) toast('Peer disconnected — link closed', 'error');
@@ -1296,10 +1558,25 @@ const Pairing = (() => {
     if (!d || typeof d !== 'object') return;
     switch (d.type) {
       case 'profile':
+      case 'profile_sync':
         peerProfile = { name: d.name || 'Peer', handle: d.handle || 'peer', avatar: d.avatar || '', ghost: !!d.ghost };
+        lastPing = Date.now(); peerOnline = !peerProfile.ghost;
+        if (!peerProfile.ghost) {   // cache so reconnects render instantly
+          try {
+            localStorage.setItem(KEYS.peerCache + peerProfile.handle, JSON.stringify({ name: peerProfile.name, handle: peerProfile.handle, avatar: peerProfile.avatar }));
+            localStorage.setItem(KEYS.peer, peerProfile.handle);
+          } catch (e) {}
+        }
         if (isBlocked(peerProfile.handle)) { try { conn.close(); } catch (e) {} conn = null; toast('Blocked peer connection refused', 'error'); return; }
         renderBar(); Room.render();
         break;
+      case 'presence_ping':
+        lastPing = Date.now();
+        if (peerProfile) { peerProfile.ghost = !!d.isGhost; peerOnline = !d.isGhost; renderBar(); Room.render(); }
+        break;
+      case 'walkie_req':     Walkie.onSessionRequest(); break;
+      case 'walkie_accept':  Walkie.onSessionAccepted(); break;
+      case 'walkie_decline': Walkie.onSessionDeclined(); break;
       case 'chat':    Chat.onIncoming(d); break;
       case 'voice':   Chat.onIncomingVoice(d); break;
       case 'ptt':     Walkie.onRemotePtt(!!d.on); break;
@@ -1314,7 +1591,7 @@ const Pairing = (() => {
 
   /* Auto-reconnect to the last saved room after a page reload */
   function autoReconnect() {
-    const saved = localStorage.getItem('dropp2p_saved_room');
+    const saved = localStorage.getItem(KEYS.room);
     if (!saved || !Identity.exists()) return;
     setTimeout(() => {
       if (isPaired()) return;
@@ -1338,7 +1615,7 @@ const Pairing = (() => {
   function init() {
     $('pairBtn').addEventListener('click', () => {
       if (isPaired()) disconnect(true);
-      else { openModal(); if (localStorage.getItem('dropp2p_saved_room')) $('pairStatusLine').textContent = 'Last room: ' + localStorage.getItem('dropp2p_saved_room'); }
+      else { openModal(); if (localStorage.getItem(KEYS.room)) $('pairStatusLine').textContent = 'Last room: ' + localStorage.getItem(KEYS.room); }
     });
     $('hostBtn').addEventListener('click', host);
     $('joinBtn').addEventListener('click', () => {
@@ -1362,7 +1639,7 @@ const Pairing = (() => {
     });
   }
 
-  return { init, openModal, host, join, send, getConnection, isPaired, getPeerProfile, _getPeerInstance, disconnect, renderBar, autoReconnect, isBlocked, addBlock, removeBlock, blocked, get roomCode() { return roomCode; } };
+  return { init, openModal, host, join, send, sendProfile, pingNow, getCachedPeer, isPeerOnline: () => peerOnline, getConnection, isPaired, getPeerProfile, _getPeerInstance, disconnect, renderBar, autoReconnect, isBlocked, addBlock, removeBlock, blocked, get roomCode() { return roomCode; } };
 })();
 
 /* ============================================================================
@@ -1379,12 +1656,12 @@ const Chat = (() => {
   const vp = () => $('chatViewport');
 
   function onPaired() {
-    const lock = document.querySelector('.chat-lock');
-    if (lock) lock.remove();
+    document.querySelectorAll('.chat-lock').forEach(l => l.remove());
     rebuildEmpty();
     document.querySelector('.composer').classList.remove('hidden');
   }
   function onUnpaired() {
+    document.querySelectorAll('.chat-lock').forEach(l => l.remove());
     const lock = document.createElement('div');
     lock.className = 'chat-lock'; lock.id = 'chatLock';
     lock.innerHTML = '<span class="cl-icon">🔒</span><div class="cl-title">Chat is locked</div><div class="cl-sub">Pair with a friend above to unlock encrypted direct messaging, voice notes and Walkie-Talkie.</div>';
@@ -1415,7 +1692,8 @@ const Chat = (() => {
     killEmpty();
     const row = document.createElement('div');
     row.className = 'chat-row' + (mine ? ' mine' : '');
-    const name = ghost ? '👻 Ghost' : (profile ? profile.name : 'Peer');
+    const who = mine ? Identity.get() : profile;
+    const name = ghost ? '👻 Ghost' : (who && who.name ? who.name : (mine ? 'You' : 'Friend'));
     const time = new Date(ts || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     row.innerHTML =
       avatarHtml(mine ? (ghost ? null : Identity.get()) : profile, ghost) +
@@ -1433,7 +1711,7 @@ const Chat = (() => {
     if (!text) return;
     Coins.requirePass('chat', 'Chat sending', () => {
       if (!Pairing.isPaired()) { toast('Pair with a friend first', 'error'); return; }
-      const ghost = localStorage.getItem('dropp2p_ghost') === '1';
+      const ghost = isGhostMode();
       Pairing.send({ type: 'chat', text, ghost });
       renderRow({ mine: true, ghost, html: `<div class="chat-text">${esc(text)}</div>` });
       input.value = ''; input.style.height = 'auto';
@@ -1500,8 +1778,8 @@ const Chat = (() => {
       const fr = new FileReader();
       fr.onload = () => {
         const dataUrl = fr.result;
-        Pairing.send({ type: 'voice', audio: dataUrl, dur, ghost: localStorage.getItem('dropp2p_ghost') === '1' });
-        renderVoice(true, dataUrl, dur, localStorage.getItem('dropp2p_ghost') === '1');
+        Pairing.send({ type: 'voice', audio: dataUrl, dur, ghost: isGhostMode() });
+        renderVoice(true, dataUrl, dur, isGhostMode());
         toast('Voice note sent 🎤', 'success');
         resolve();
       };
@@ -1563,6 +1841,7 @@ const Walkie = (() => {
   let call = null, localStream = null, remoteStream = null;
   let audioCtx = null, analyser = null, rafId = null, vizStream = null;
   let talking = false;
+  let session = false, reqPending = false;   // mutual acceptance gate
 
   const remoteAudio = () => { let a = $('remoteAudioEl'); if (!a) { a = document.createElement('audio'); a.id = 'remoteAudioEl'; a.autoplay = true; document.body.appendChild(a); } return a; };
 
@@ -1575,7 +1854,7 @@ const Walkie = (() => {
   }
 
   async function onIncomingCall(incoming) {
-    if (!Pairing.isPaired()) { try { incoming.close(); } catch (e) {} return; }
+    if (!Pairing.isPaired() || !session) { try { incoming.close(); } catch (e) {} return; }
     try { if (!localStream) localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { /* answer receive-only */ }
     try { incoming.answer(localStream || undefined); } catch (e) { try { incoming.answer(); } catch (e2) {} }
     incoming.on('stream', (rs) => {
@@ -1621,6 +1900,32 @@ const Walkie = (() => {
     if (!remoteStream) { stopViz(); }
   }
 
+  /* ---- Conversation session gate: both sides must accept before live audio ---- */
+  function requestSession() {
+    if (reqPending) { toast('Still waiting for your friend to accept…'); return; }
+    reqPending = true;
+    Pairing.send({ type: 'walkie_req' });
+    toast('Asking your friend to open Walkie-Talkie…');
+    setTimeout(() => { reqPending = false; }, 20000);
+  }
+  function onSessionRequest() {
+    const pp = Pairing.getPeerProfile() || { name: 'Peer', handle: 'peer', avatar: '' };
+    const av = $('walkieAvatar');
+    av.src = pp.avatar || Identity.initialsAvatar(pp.name);
+    $('walkiePeer').textContent = pp.name + ' (@' + pp.handle + ')';
+    const m = $('walkieModal'); m.classList.remove('hidden');
+    $('walkieAcceptBtn').onclick = () => {
+      m.classList.add('hidden'); session = true;
+      Pairing.send({ type: 'walkie_accept' });
+      toast('Walkie-Talkie session open ✅', 'success');
+    };
+    $('walkieDeclineBtn').onclick = () => {
+      m.classList.add('hidden'); Pairing.send({ type: 'walkie_decline' });
+    };
+  }
+  function onSessionAccepted() { session = true; reqPending = false; toast('Walkie-Talkie ready — hold to talk 🎙️', 'success'); }
+  function onSessionDeclined() { reqPending = false; toast('Walkie-Talkie request declined', 'error'); }
+
   function onRemotePtt(on) { /* stream events drive the banner; ptt msg is a fast signal */
     if (!on && !remoteStream) banner(false);
   }
@@ -1658,6 +1963,7 @@ const Walkie = (() => {
   }
 
   function onDisconnect() {
+    session = false; reqPending = false; $('walkieModal').classList.add('hidden');
     stopTalk(); banner(false); stopViz();
     remoteStream = null;
     const a = remoteAudio(); if (a) a.srcObject = null;
@@ -1668,6 +1974,8 @@ const Walkie = (() => {
     const btn = $('pttButton');
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
+      if (!Pairing.isPaired()) { toast('Pair with a friend first', 'error'); return; }
+      if (!session) { requestSession(); return; }
       Coins.requirePass('mic', 'Walkie-Talkie mic', () => startTalk());  // listening stays free
     });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => btn.addEventListener(ev, stopTalk));
@@ -1681,7 +1989,7 @@ const Walkie = (() => {
     });
   }
 
-  return { init, onIncomingCall, onRemotePtt, onDisconnect, startTalk, stopTalk };
+  return { init, onIncomingCall, onRemotePtt, onDisconnect, startTalk, stopTalk, onSessionRequest, onSessionAccepted, onSessionDeclined };
 })();
 
 /* ============================================================================
@@ -1944,7 +2252,7 @@ const Room = (() => {
   function render() {
     const me = Identity.get() || { name: 'You', handle: 'you', avatar: '' };
     const pp = Pairing.getPeerProfile();
-    const ghost = localStorage.getItem('dropp2p_ghost') === '1';
+    const ghost = isGhostMode();
     $('meAvatar').innerHTML = avatarTile(me, ghost);
     $('meName').textContent = ghost ? '👻 Ghost' : me.name;
     $('meHandle').textContent = '@' + (ghost ? 'ghost' : me.handle);
@@ -1953,11 +2261,20 @@ const Room = (() => {
       youTile.innerHTML = avatarTile(pp, pp.ghost);
       $('youName').textContent = pp.ghost ? '👻 Ghost' : pp.name;
       $('youHandle').textContent = '@' + (pp.ghost ? 'ghost' : pp.handle);
+      $('youPresence').textContent = Pairing.isPeerOnline() ? '🟢 Online' : '⚪ Offline';
       $('blockFriendBtn').classList.remove('hidden');
     } else {
-      youTile.innerHTML = '<div class="avatar-tile"><span class="at-fallback">?</span></div>';
-      $('youName').textContent = 'Waiting…';
-      $('youHandle').textContent = 'not paired';
+      const cached = Pairing.getCachedPeer();
+      if (cached) {
+        youTile.innerHTML = avatarTile(cached, false);
+        $('youName').textContent = cached.name;
+        $('youHandle').textContent = '@' + cached.handle;
+      } else {
+        youTile.innerHTML = '<div class="avatar-tile"><span class="at-fallback">?</span></div>';
+        $('youName').textContent = 'Waiting…';
+        $('youHandle').textContent = 'not paired';
+      }
+      $('youPresence').textContent = '⚪ Offline';
       $('blockFriendBtn').classList.add('hidden');
     }
     renderBlocklist();
@@ -1982,11 +2299,11 @@ const Room = (() => {
   /* ---------- Ghost mode toggle ---------- */
   function toggleGhost() {
     const on = $('ghostToggle').classList.toggle('on');
-    localStorage.setItem('dropp2p_ghost', on ? '1' : '0');
+    localStorage.setItem(KEYS.ghost, on ? 'true' : 'false');
     toast(on ? 'Ghost mode ON — you appear anonymous 👻' : 'Ghost mode OFF', on ? 'success' : '');
     if (Pairing.isPaired()) {
       const me = Identity.get();
-      Pairing.send({ type: 'profile', name: on ? 'Ghost' : me.name, handle: on ? 'ghost' : me.handle, avatar: on ? '' : me.avatar, ghost: on });
+      Pairing.sendProfile(); Pairing.pingNow();
       render();
     }
   }
@@ -2024,7 +2341,7 @@ const Room = (() => {
   }
 
   function init() {
-    $('ghostToggle').classList.toggle('on', localStorage.getItem('dropp2p_ghost') === '1');
+    $('ghostToggle').classList.toggle('on', isGhostMode());
     $('ghostToggle').addEventListener('click', toggleGhost);
     $('blockFriendBtn').addEventListener('click', blockPeer);
     $('ballFloor').addEventListener('click', (event) => {
@@ -2083,10 +2400,13 @@ const DropP2PFinal = (() => {
     Switch.init();
 
     Identity.load();
+    if (Identity.exists() && grantWelcomeCoins()) setTimeout(() => toast(`🎁 ${SITE_CONFIG.welcomeCoins} free DropCoins added!`, 'success'), 600);
     Identity.renderHeader();
+    Identity.ensureClaim();
     Coins.renderBalance();
     Chat.onUnpaired();
     Room.render();
+    Pairing.renderBar();
 
     /* Deep link: ?room=123456 → prefill join code */
     const params = new URLSearchParams(location.search);
